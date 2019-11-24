@@ -3,6 +3,7 @@ package me.security;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.List;
 
 import me.security.managers.DatabaseManager;
@@ -30,7 +31,13 @@ public class AppClient {
 		}
 		
 		List<String> dbInfo = Files.readAllLines(dbPassword.toPath());
-		DatabaseManager db = new DatabaseManager(dbInfo.get(0), dbInfo.get(1), dbInfo.get(2), dbInfo.get(3));
+		DatabaseManager db = null;
+		try {
+			db = new DatabaseManager(dbInfo.get(0), dbInfo.get(1), dbInfo.get(2), dbInfo.get(3));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 		
 		/*
 		 * Notification
