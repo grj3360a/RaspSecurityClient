@@ -7,7 +7,7 @@ import com.hopding.jrpicam.RPiCamera;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 
 /**
- * @author Ekinoxx
+ * @author Geraldes Jocelyn
  * @since 24/11/2019
  * 
  * As of this date, can't test this because we still don't have a camera.
