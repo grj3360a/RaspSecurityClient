@@ -13,20 +13,41 @@ public class NotificationManager {
 		senders = new ArrayList<NotificationSender>();
 	}
 	
-	public void trigger(String value) throws Exception{
+	public void trigger(String value) {
 		for(NotificationSender sender : senders) {
-			sender.trigger(value);
+			try {
+				sender.trigger(value);
+			} catch(UnsupportedOperationException ex) {
+			} catch(Exception ex) {
+				ex.printStackTrace();
+				//TODO Remove from senders if error occuring ?
+			}
 		}
 	}
 	
-	public void trigger(List<String> values) throws Exception{
+	public void trigger(List<String> values) {
 		for(NotificationSender sender : senders) {
-			sender.trigger(values);
+			try {
+				sender.trigger(values);
+			} catch(UnsupportedOperationException ex) {
+			} catch(Exception ex) {
+				ex.printStackTrace();
+				//TODO Remove from senders if error occuring ?
+			}
 		}
 	}
 
 	public void add(NotificationSender ns) {
 		this.senders.add(ns);
+	}
+	
+	@Override
+	public String toString() {
+		String s = "Currently active notifications system:\n";
+		for(NotificationSender ns : senders) {
+			s += " - " + ns.getClass().getName() + "\n";
+		}
+		return s;
 	}
 	
 }
