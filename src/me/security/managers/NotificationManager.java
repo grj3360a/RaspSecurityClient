@@ -24,5 +24,9 @@ public class NotificationManager {
 			sender.trigger(values);
 		}
 	}
+
+	public void add(NotificationSender ns) {
+		this.senders.add(ns);
+	}
 	
 }
