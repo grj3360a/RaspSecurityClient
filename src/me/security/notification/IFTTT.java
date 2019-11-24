@@ -1,6 +1,7 @@
-package me.security.lib;
+package me.security.notification;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.client.HttpClient;
@@ -9,9 +10,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
- * @author https://github.com/lodenrogue/JMaker
+ * 
+ * BASED ON https://github.com/lodenrogue/JMaker
  */
-public class IFTTT {
+public class IFTTT extends NotificationSender {
 	private String eventName;
 	private String key;
 
@@ -20,10 +22,9 @@ public class IFTTT {
 		this.key = key;
 	}
 
-	public void trigger() throws IOException {
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost request = new HttpPost("https://maker.ifttt.com/trigger/" + eventName + "/with/key/" + key);
-		httpClient.execute(request);
+	@Override
+	public void trigger(String value) throws Exception {
+		trigger(Arrays.asList(value));
 	}
 
 	public void trigger(List<String> values) throws IOException {
