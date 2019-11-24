@@ -78,3 +78,6 @@ local.properties
 .scala_dependencies
 .worksheet
 /target/
+/database.password
+/free.password
+/ifttt.password
