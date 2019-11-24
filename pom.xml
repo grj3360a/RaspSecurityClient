@@ -50,6 +50,13 @@
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.pi4j/pi4j-core -->
 		<dependency>
@@ -70,6 +77,13 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.18</version>
+		</dependency>
+		
+		<!-- https://jitpack.io/#Hopding/JRPiCam/v1.1.1 -->
+		<dependency>
+			<groupId>com.github.Hopding</groupId>
+			<artifactId>JRPiCam</artifactId>
+			<version>v1.1.1</version>
 		</dependency>
 
 	</dependencies>

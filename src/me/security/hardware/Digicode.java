@@ -6,7 +6,7 @@ package me.security.hardware;
  */
 public class Digicode extends HardwareElement {
 	
-	private static final char[][] keys = {	{'1', '2', '3', 'A'},
+	private static final char[][] KEYS = {	{'1', '2', '3', 'A'},
 					 	   					{'4', '5', '6', 'B'},
 					 	   					{'7', '8', '9', 'C'},
 					 	   					{'*', '0', '#', 'D'}};
@@ -14,6 +14,10 @@ public class Digicode extends HardwareElement {
 	private char[] code;
 	
 	public Digicode() {
+		
+	}
+	
+	public void onValidate() {
 		
 	}
 	

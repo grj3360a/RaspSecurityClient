@@ -11,7 +11,7 @@ import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
-public class RaspSecurityClient {
+public class AppTesting {
 
 	public static final GpioController GPIO = GpioFactory.getInstance();
 	
