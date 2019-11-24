@@ -12,13 +12,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
  * @author Geraldes Jocelyn
+ * @since 24/11/2019
  */
-public class FreeMessage extends NotificationSender {
+public class NotificationFreeAPI extends NotificationSender {
 	
 	private final int user;
 	private final String password;
 	
-	public FreeMessage(int user, String password) throws IllegalArgumentException {
+	public NotificationFreeAPI(int user, String password) throws IllegalArgumentException {
 		if(user >= 100000000 || user <= 00100000) throw new IllegalArgumentException("User id not valid size");
 		if(password.length() != 14) throw new IllegalArgumentException("Password not valid size");
 		this.user = user;

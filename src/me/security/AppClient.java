@@ -8,9 +8,13 @@ import java.util.List;
 import me.security.managers.DatabaseManager;
 import me.security.managers.NotificationManager;
 import me.security.managers.SecurityManager;
-import me.security.notification.FreeMessage;
-import me.security.notification.IFTTT;
+import me.security.notification.NotificationFreeAPI;
+import me.security.notification.NotificationIFTTT;
 
+/**
+ * @author Geraldes Jocelyn
+ * @since 24/11/2019
+ */
 public class AppClient {
 
 	public static void main(String[] args) throws Exception {
@@ -37,16 +41,16 @@ public class AppClient {
 		 */
 		NotificationManager notif = new NotificationManager();
 		
-		FreeMessage fm = generateFree();
+		NotificationFreeAPI fm = generateFree();
 		if(fm != null) notif.add(fm);
 		
-		IFTTT ifttt = generateIFTTT();
+		NotificationIFTTT ifttt = generateIFTTT();
 		if(ifttt != null) notif.add(ifttt);
 		
 		/*
 		 * Security handler
 		 */
-		SecurityManager security = new SecurityManager(notif, db);
+		new SecurityManager(notif, db);
 		
 		//Adding closing mechanism to shutdown DB connection
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -56,7 +60,7 @@ public class AppClient {
 		}));
 	}
 	
-	public static FreeMessage generateFree() {
+	public static NotificationFreeAPI generateFree() {
 		File freePwd = new File("./free.password");
 
 		if(!freePwd.exists() || !freePwd.canRead()) {
@@ -84,10 +88,10 @@ public class AppClient {
 			return null;
 		}
 		
-		return new FreeMessage(Integer.parseInt(freeInfo.get(0)), freeInfo.get(1));
+		return new NotificationFreeAPI(Integer.parseInt(freeInfo.get(0)), freeInfo.get(1));
 	}
 	
-	public static IFTTT generateIFTTT() {
+	public static NotificationIFTTT generateIFTTT() {
 		File iftttPwd = new File("./ifttt.password");
 
 		if(!iftttPwd.exists() || !iftttPwd.canRead()) {
@@ -108,7 +112,7 @@ public class AppClient {
 			return null;
 		}
 		
-		return new IFTTT(iftttInfo.get(0), iftttInfo.get(1));
+		return new NotificationIFTTT(iftttInfo.get(0), iftttInfo.get(1));
 	}
 
 }

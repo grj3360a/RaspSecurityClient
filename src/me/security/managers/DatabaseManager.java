@@ -5,6 +5,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * @author Geraldes Jocelyn
+ * @since 24/11/2019
+ */
 public class DatabaseManager implements AutoCloseable {
 	
 	private final Connection connection;
