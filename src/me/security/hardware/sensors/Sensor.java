@@ -8,10 +8,10 @@ import me.security.hardware.HardwareElement;
  */
 public abstract class Sensor extends HardwareElement {
 	
-	private SensorType type;
-	
 	public Sensor() {
 		
 	}
+	
+	public abstract SensorType getType();
 	
 }

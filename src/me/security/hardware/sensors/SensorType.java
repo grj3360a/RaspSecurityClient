@@ -8,6 +8,7 @@ package me.security.hardware.sensors;
  */
 public enum SensorType {
 	
+	OPEN,
 	MOTION,
 	HEAT,
 	GAS,
