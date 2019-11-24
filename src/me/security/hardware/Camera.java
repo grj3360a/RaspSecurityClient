@@ -11,6 +11,7 @@ import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
  * @since 24/11/2019
  * 
  * As of this date, can't test this because we still don't have a camera.
+ * @see https://github.com/Hopding/JRPiCam
  */
 public class Camera {
 	
