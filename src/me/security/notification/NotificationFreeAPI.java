@@ -20,7 +20,7 @@ public class NotificationFreeAPI extends NotificationSender {
 	private final String password;
 	
 	public NotificationFreeAPI(int user, String password) throws IllegalArgumentException {
-		if(user >= 100000000 || user <= 00100000) throw new IllegalArgumentException("User id not valid size");
+		if(user >= 100000000 || user <= 00100000) throw new IllegalArgumentException("User id not valid size"); // Magic values to 
 		if(password.length() != 14) throw new IllegalArgumentException("Password not valid size");
 		this.user = user;
 		this.password = password;
