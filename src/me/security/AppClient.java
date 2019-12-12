@@ -7,7 +7,7 @@ import java.util.List;
 
 import me.security.managers.DatabaseManager;
 import me.security.managers.NotificationManager;
-import me.security.managers.SecurityManager;
+import me.security.managers.SecuManager;
 import me.security.notification.NotificationFreeAPI;
 import me.security.notification.NotificationIFTTT;
 
@@ -50,7 +50,7 @@ public class AppClient {
 		/*
 		 * Security handler
 		 */
-		new SecurityManager(notif, db);
+		new SecuManager(notif, db);
 		
 		//Adding closing mechanism to shutdown DB connection
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
