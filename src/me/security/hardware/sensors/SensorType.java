@@ -8,14 +8,20 @@ package me.security.hardware.sensors;
  */
 public enum SensorType {
 	
-	OPEN("Intrusion par une fenêtre détecté !"),
-	MOTION("Mouvement dans la maison détecté !"),
-	HEAT("Chaleur anormale détecté !"),
-	GAS("Présence anormale de gaz détecté !");
+	OPEN(0, "Intrusion par une fenêtre détecté !"),
+	MOTION(1000L * 60 * 4, "Mouvement dans la maison détecté !"),
+	HEAT(1000L * 60 * 4, "Chaleur anormale détecté !"),
+	GAS(1000L * 60 * 4, "Présence anormale de gaz détecté !");
 	
+	private final long timeBetweenActivation;
 	private final String alert;
-	private SensorType(String alert) {
+	private SensorType(long timeBetweenActivation, String alert) {
+		this.timeBetweenActivation = timeBetweenActivation;
 		this.alert = alert;
+	}
+	
+	public long getTimeBetweenActivation() {
+		return this.timeBetweenActivation;
 	}
 	
 	public String getAlertMessage() {

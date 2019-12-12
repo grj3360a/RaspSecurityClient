@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioProvider;
+import com.pi4j.io.gpio.SimulatedGpioProvider;
+
 import me.security.managers.DatabaseManager;
 import me.security.managers.NotificationManager;
 import me.security.managers.SecuManager;
@@ -18,6 +22,12 @@ import me.security.notification.NotificationIFTTT;
 public class AppClient {
 
 	public static void main(String[] args) throws Exception {
+		for(String s : args) {
+			if(s.toLowerCase().equals("--windows")) {
+				windowsModeSetup();
+			}
+		}
+		
 		/*
 		 * Database
 		 */
@@ -58,6 +68,15 @@ public class AppClient {
 		    	db.close();
 		    }
 		}));
+		
+		while(true) { // We need this thread to sleep while WiringPi is running in background.
+			Thread.sleep(1000L);
+		}
+	}
+	
+	public static void windowsModeSetup() {
+        GpioProvider provider = new SimulatedGpioProvider();
+        GpioFactory.setDefaultProvider(provider);
 	}
 	
 	public static NotificationFreeAPI generateFree() {

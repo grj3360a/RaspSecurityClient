@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import me.security.hardware.sensors.SensorType;
+
 /**
  * @author Geraldes Jocelyn
  * @since 24/11/2019
@@ -27,6 +29,19 @@ public class DatabaseManager implements AutoCloseable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			//Ignore the error as error on logging will not be damageable for our code
+		}
+	}
+
+	public void alert(String sensorName, SensorType type) {
+		if(type == null) throw new IllegalArgumentException();
+		try {
+			PreparedStatement stmt = connection.prepareStatement("INSERT INTO `alerte` (`name`,`type`) VALUES (?,?);");
+			stmt.setString(1, sensorName);
+			stmt.setString(2, type.toString());
+			stmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			this.rawLog("Error occured while logging an alert :\n" + e.getLocalizedMessage() + "\n" + type.toString());
 		}
 	}
 

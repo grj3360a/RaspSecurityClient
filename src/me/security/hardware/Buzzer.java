@@ -6,7 +6,7 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
  * @author Geraldes Jocelyn
  * @since 24/11/2019
  */
-public class Buzzer extends HardwareElement {
+public class Buzzer {
 	
 	private final GpioPinDigitalOutput pin;
 	

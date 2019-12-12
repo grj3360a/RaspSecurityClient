@@ -8,17 +8,16 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
  * @author Geraldes Jocelyn
  * @since 24/11/2019
  */
-public class Led extends HardwareElement {
+public class Led {
 	
 	private final GpioPinDigitalOutput pin;
 	
 	public Led(GpioPinDigitalOutput pin) {
 		this.pin = pin;
 		this.pin.setState(false);
-		this.waiting();
 	}
 	
-	public void waiting() {
+	public void flashing() {
 		this.pin.blink(600, Long.MAX_VALUE);
 	}
 	
@@ -26,7 +25,7 @@ public class Led extends HardwareElement {
 		this.pin.pulse(200L, new Callable<Void>() {
 			@Override
 			public Void call() throws Exception {
-				Led.this.waiting();
+				Led.this.flashing();
 				return null;
 			}
 		});
