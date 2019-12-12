@@ -43,17 +43,16 @@ public class SecuManager {
 	}
 	
 	public void initializeHardware() {
-		this.blueLed = new Led(GPIO, RaspiPin.GPIO_25);
+		this.blueLed = new Led(this, RaspiPin.GPIO_25);
 		this.blueLed.flashing();
-		this.redLed = new Led(GPIO, RaspiPin.GPIO_22);
+		this.redLed = new Led(this, RaspiPin.GPIO_22);
 		this.redLed.hide();
 
-		this.alarm = new Alarm(GPIO, RaspiPin.GPIO_00);
-		this.buzzer = new Buzzer(GPIO, RaspiPin.GPIO_26);
+		this.alarm = new Alarm(this, RaspiPin.GPIO_27);
+		this.buzzer = new Buzzer(this, RaspiPin.GPIO_26);
 		
 		this.digicode = new Digicode
 				(this,
-				GPIO, 
 				"1574", 
 				new Pin[]{RaspiPin.GPIO_14, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05}, 
 				new Pin[]{RaspiPin.GPIO_04, RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_00});
@@ -83,6 +82,23 @@ public class SecuManager {
 		this.enabled = !enabled;
 		this.db.rawLog("Alarm toggled " + (enabled ? "ON" : "OFF") + " with code : " + code);
 		this.notif.triggerIFTTT("Alarme " + (enabled ? "activée" : "désactivée") + " avec le code " + code);
+		this.buzzer.flashingBuzz();
 	}
-	
+
+	public GpioController getGPIO() {
+		return GPIO;
+	}
+
+	public NotificationManager getNotif() {
+		return notif;
+	}
+
+	public DatabaseManager getDb() {
+		return db;
+	}
+
+	public Buzzer getBuzzer() {
+		return buzzer;
+	}
+
 }

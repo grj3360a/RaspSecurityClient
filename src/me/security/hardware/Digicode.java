@@ -13,6 +13,7 @@ import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
+import me.security.hardware.sensors.SensorType;
 import me.security.managers.SecuManager;
 
 /**
@@ -22,6 +23,7 @@ import me.security.managers.SecuManager;
 public class Digicode {
 	
 	private static final int BUFFER_SIZE = 4;
+	private static final int MAXIMUM_NUMBER_OF_TRY = 3;
 	private static final char[][] KEYS = {	{'1', '2', '3', 'A'},
 					 	   					{'4', '5', '6', 'B'},
 					 	   					{'7', '8', '9', 'C'},
@@ -32,6 +34,9 @@ public class Digicode {
 	private List<char[]> passcodes;//Valid codes to enable/disable alarm
 	private char[] typedBuffer = new char[BUFFER_SIZE];//Typed keys buffer
 	private char nTypedBuffer = 0;//Number of key already typed
+	
+	private long timeLastError = 0;
+	private int numberOfError = 0;
 
 	private GpioPinDigitalMultipurpose padl1;
 	private GpioPinDigitalMultipurpose padl2;
@@ -48,9 +53,8 @@ public class Digicode {
 	private final GpioPinDigitalMultipurpose[] padl;
 	
 	
-	public Digicode(SecuManager secuManager, GpioController gpio, String defaultCode, Pin[] lines, Pin[] columns) {
+	public Digicode(SecuManager secuManager, String defaultCode, Pin[] lines, Pin[] columns) {
 		if(secuManager == null) throw new IllegalArgumentException();
-		if(gpio == null) throw new IllegalArgumentException();
 		if(lines == null || lines.length != 4) throw new IllegalArgumentException();
 		if(columns == null || columns.length != 4) throw new IllegalArgumentException();
 		
@@ -58,15 +62,15 @@ public class Digicode {
 		this.passcodes = new ArrayList<char[]>();
 		this.addPasscode(defaultCode);
 		
-		this.padl1 = gpio.provisionDigitalMultipurposePin(lines[0], "0", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
-		this.padl2 = gpio.provisionDigitalMultipurposePin(lines[1], "1", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
-		this.padl3 = gpio.provisionDigitalMultipurposePin(lines[2], "2", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
-		this.padl4 = gpio.provisionDigitalMultipurposePin(lines[3], "3", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
+		this.padl1 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[0], "0", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
+		this.padl2 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[1], "1", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
+		this.padl3 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[2], "2", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
+		this.padl4 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[3], "3", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
 		
-		this.padc1 = gpio.provisionDigitalMultipurposePin(columns[0], "0", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
-		this.padc2 = gpio.provisionDigitalMultipurposePin(columns[1], "1", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
-		this.padc3 = gpio.provisionDigitalMultipurposePin(columns[2], "2", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
-		this.padc4 = gpio.provisionDigitalMultipurposePin(columns[3], "3", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
+		this.padc1 = secuManager.getGPIO().provisionDigitalMultipurposePin(columns[0], "0", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
+		this.padc2 = secuManager.getGPIO().provisionDigitalMultipurposePin(columns[1], "1", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
+		this.padc3 = secuManager.getGPIO().provisionDigitalMultipurposePin(columns[2], "2", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
+		this.padc4 = secuManager.getGPIO().provisionDigitalMultipurposePin(columns[3], "3", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
 
 		this.pad = new GpioPinDigitalMultipurpose[]{padc1, padc2, padc3, padc4, padl1, padl2, padl3, padl4};
 		this.padc = new GpioPinDigitalMultipurpose[]{padc1, padc2, padc3, padc4};
@@ -113,7 +117,7 @@ public class Digicode {
 					
 					try {
 						if(numberOfInput > 1 || numberOfInput == 0) {
-							throw new Exception("Multiple input in lines... Unable to calculate key from digicode.");
+							throw new Exception((numberOfInput > 0 ? "Multiple" : "No") + " input in lines... Unable to calculate key from digicode.");
 						}
 						
 						for(GpioPinDigitalMultipurpose po : padl) {
@@ -139,6 +143,7 @@ public class Digicode {
 	}
 	
 	private void input(char c) throws Exception {
+		System.out.println("Just pressed on digicode : " + c);
 		switch(c) {
 
 		case '0':
@@ -201,11 +206,29 @@ public class Digicode {
 			throw new IllegalStateException("Digicode used a != 4 passcode.");
 		}
 		
+		System.out.println("Validating passcode.");
+		
+		boolean goodPasscode = false;
+		
 		for(char[] code : this.passcodes) {
-			if(this.typedBuffer == code) {
+			if(this.typedBuffer == code && !goodPasscode) {
 				this.secuManager.toggleAlarm(new String(code));
-				break;//Multiple code are valid ?
+				goodPasscode = true;
+				this.timeLastError = 0;
+				this.numberOfError = 0;
 			}
+		}
+		
+		if(!goodPasscode) {
+			this.timeLastError = System.currentTimeMillis();
+			this.numberOfError++;
+			this.secuManager.getDb().rawLog("Passcode error on Digicode");
+			this.secuManager.getNotif().triggerIFTTT("Erreur de digicode...");
+			this.secuManager.getBuzzer().buzz();
+		}
+		
+		if(this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
+			this.secuManager.triggerAlarm("Nombre d'erreur", SensorType.DIGICODE);
 		}
 	}
 

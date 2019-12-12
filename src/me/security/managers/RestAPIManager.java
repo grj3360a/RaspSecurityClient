@@ -16,10 +16,12 @@ import java.util.Scanner;
  *
  */
 public class RestAPIManager {
-	private static final String DOCUMENT_ROOT = System.getProperty("user.dir");
-	private static final int PORT = 80;
+	private static final int PORT = 8080;
+	
+	private final SecuManager security;
 
-	public RestAPIManager() {
+	public RestAPIManager(SecuManager security) {
+		this.security = security;
 		try (ServerSocket server = new ServerSocket(PORT)) {
 			System.out.println("Listening on port" + server.getLocalPort());
 
@@ -47,23 +49,46 @@ public class RestAPIManager {
 		public void run() {
 			String clientIP = client.getInetAddress().toString();
 			int clientPort = client.getPort();
-			System.out.println(
-					"Connection " + counter + " : connected from " + clientIP + " with port " + clientPort + ".");
+			System.out.println("Connection " + counter + " : connected from " + clientIP + " with port " + clientPort + ".");
 			try (InputStream input = client.getInputStream(); OutputStream output = client.getOutputStream()) {
 
 				String url = getRequestUrl(input);
 				if (url == null) {
+					System.out.println("null");
 					return;
 				}
-
-				String responseFilePath = DOCUMENT_ROOT + url;
-				File file = new File(responseFilePath);
-				if (!file.exists()) {
+				
+				PrintStream out = new PrintStream(output);
+				out.println("HTTP/1.0 404 Not Found");
+				out.println("");
+				out.println("NOT FOUND");
+				out.println("");
+				out.println("nope");
+				out.println("");
+				out.flush();
+/*
+				switch(url) {
+				
+				case "/notify":
+					sendHeader(output);
+					sendText(output, "[{\"id_alerte\":1,\"date\":1576166249948,\"type\":\"motion\"},{\"id_alerte\":2,\"date\":1576100220948,\"type\":\"gas\"},{\"id_alerte\":3,\"date\":1576189249948,\"type\":\"motion\"}]");
+					break;
+				
+				case "/sensors":
+					sendHeader(output);
+					sendText(output, "[{\"id\":1,\"type\":\"MOTION\",\"lastActive\":1576165908504,\"isEnabled\":true},{\"id\":2,\"type\":\"MOTION\",\"lastActive\":1576234568504,\"isEnabled\":true},{\"id\":3,\"type\":\"GAS\",\"lastActive\":-1,\"isEnabled\":true},{\"id\":4,\"type\":\"HEAT\",\"lastActive\":-1,\"isEnabled\":false},{\"id\":5,\"type\":\"MOTION\",\"lastActive\":1576146546544,\"isEnabled\":true}]");
+					break;
+				
+				default:
 					sendNotFound(output);
-					return;
-				}
-				sendHeader(output);
-				sendFile(output, file);
+					break;
+				
+				}*/
+				
+				output.flush();
+				output.close();
+				input.close();
+				this.client.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -79,10 +104,6 @@ public class RestAPIManager {
 
 			String line = reader.next();
 			String url = line.split(" ")[1];
-			while (reader.hasNext()) {
-				System.out.println(line);
-				line = reader.next();
-			}
 			reader.close();
 			return url;
 		}
@@ -92,16 +113,29 @@ public class RestAPIManager {
 			out.println("HTTP/1.0 404 Not Found");
 			out.println("");
 			out.println("NOT FOUND");
+			out.println("");
+			out.println("nope");
+			out.println("");
+			out.flush();
 		}
 
 		private void sendHeader(OutputStream output) {
 			PrintStream out = new PrintStream(output);
 			out.println("HTTP/1.0 200 OK");
 			out.println("MIME_version:1.0");
-			out.println("Content_Type:text/htm1");
+			out.println("Content-Type:application/json");
 			out.println("");
+			out.flush();
+		}
+		
+		private void sendText(OutputStream output, String text) {
+			PrintStream out = new PrintStream(output);
+			out.println(text);
+			out.println("");
+			out.flush();
 		}
 
+		@SuppressWarnings("unused")
 		private void sendFile(OutputStream output, File file) throws IOException {
 			try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
 				int len = (int) file.length();
