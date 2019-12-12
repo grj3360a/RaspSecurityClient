@@ -2,7 +2,9 @@ package me.security.hardware;
 
 import java.util.concurrent.Callable;
 
+import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import com.pi4j.io.gpio.Pin;
 
 /**
  * @author Geraldes Jocelyn
@@ -12,8 +14,8 @@ public class Led {
 	
 	private final GpioPinDigitalOutput pin;
 	
-	public Led(GpioPinDigitalOutput pin) {
-		this.pin = pin;
+	public Led(GpioController gpio, Pin pin) {
+		this.pin = gpio.provisionDigitalOutputPin(pin);
 		this.pin.setState(false);
 	}
 	
@@ -34,6 +36,11 @@ public class Led {
 	public void hide() {
 		this.pin.blink(0, 0L);
 		this.pin.setState(false);
+	}
+	
+	public void display() {
+		this.pin.blink(0, 0L);
+		this.pin.setState(true);
 	}
 	
 }

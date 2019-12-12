@@ -1,6 +1,8 @@
 package me.security.hardware;
 
+import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import com.pi4j.io.gpio.Pin;
 
 /**
  * @author Geraldes Jocelyn
@@ -9,14 +11,18 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 public class Buzzer {
 	
 	private final GpioPinDigitalOutput pin;
-	
-	public Buzzer(GpioPinDigitalOutput pin) {
-		this.pin = pin;
+
+	public Buzzer(GpioController gpio, Pin pin) {
+		this.pin = gpio.provisionDigitalOutputPin(pin);
 		this.pin.setState(false);
 	}
 	
 	public void buzz() {
-		this.pin.pulse(2000L);
+		this.pin.pulse(1000L);
+	}
+	
+	public void flashingBuzz() {
+		this.pin.blink(800L, 6 * 1000L);
 	}
 	
 }

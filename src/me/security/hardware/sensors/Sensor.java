@@ -50,7 +50,7 @@ public class Sensor {
 	public boolean detect() {
 		if(!isEnabled && lastActivated + this.getType().getTimeBetweenActivation() < System.currentTimeMillis()) return false;
 		this.lastActivated = System.currentTimeMillis();
-		this.manager.detect(this.name, this.getType());
+		this.manager.triggerAlarm(this.name, this.getType());
 		return true;
 	}
 	
