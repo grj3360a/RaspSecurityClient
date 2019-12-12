@@ -21,14 +21,17 @@ import me.security.managers.SecuManager;
  */
 public class Digicode {
 	
-	private static final int BUFFER_SIZE = 16;
+	private static final int BUFFER_SIZE = 4;
 	private static final char[][] KEYS = {	{'1', '2', '3', 'A'},
 					 	   					{'4', '5', '6', 'B'},
 					 	   					{'7', '8', '9', 'C'},
 					 	   					{'*', '0', '#', 'D'}};
+
+	private final SecuManager secuManager;
 	
-	private List<char[]> codes;
-	private char[] typedBuffer = new char[BUFFER_SIZE];
+	private List<char[]> passcodes;//Valid codes to enable/disable alarm
+	private char[] typedBuffer = new char[BUFFER_SIZE];//Typed keys buffer
+	private char nTypedBuffer = 0;//Number of key already typed
 
 	private GpioPinDigitalMultipurpose padl1;
 	private GpioPinDigitalMultipurpose padl2;
@@ -45,14 +48,15 @@ public class Digicode {
 	private final GpioPinDigitalMultipurpose[] padl;
 	
 	
-	public Digicode(SecuManager secuManager, GpioController gpio, char[] defaultCode, Pin[] lines, Pin[] columns) {
+	public Digicode(SecuManager secuManager, GpioController gpio, String defaultCode, Pin[] lines, Pin[] columns) {
+		if(secuManager == null) throw new IllegalArgumentException();
 		if(gpio == null) throw new IllegalArgumentException();
-		if(defaultCode == null || defaultCode.length == 0) throw new IllegalArgumentException();
 		if(lines == null || lines.length != 4) throw new IllegalArgumentException();
 		if(columns == null || columns.length != 4) throw new IllegalArgumentException();
 		
-		this.codes = new ArrayList<char[]>();
-		this.codes.add(defaultCode);
+		this.secuManager = secuManager;
+		this.passcodes = new ArrayList<char[]>();
+		this.addPasscode(defaultCode);
 		
 		this.padl1 = gpio.provisionDigitalMultipurposePin(lines[0], "0", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
 		this.padl2 = gpio.provisionDigitalMultipurposePin(lines[1], "1", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
@@ -134,11 +138,41 @@ public class Digicode {
 		}
 	}
 	
-	public void input(char c) throws Exception {
+	private void input(char c) throws Exception {
 		switch(c) {
+
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			if(this.nTypedBuffer >= BUFFER_SIZE) {
+				//FIXME Too much keys pressed.
+				return;
+			}
+			
+			this.typedBuffer[nTypedBuffer] = c;
+			this.nTypedBuffer++;
+			break;
+			
+		case '#':// Key to validate
+			this.onValidate();
+			this.cleanBuffer();
+			break;
+			
+		case 'A':// Unused key for now (Maybe add new code ?)
+		case 'B':// Unused key for now
+		case 'C':// Unused key for now
+		case 'D':// Unused key for now
+			break;
 		
 		case '*':// Key to clear all typed letters
-			this.typedBuffer = new char[BUFFER_SIZE];
+			this.cleanBuffer();
 			break;
 		
 		default:
@@ -147,10 +181,30 @@ public class Digicode {
 		}
 	}
 	
-	public void onValidate() {
-		for(char[] code : this.codes) {
+	private void cleanBuffer() {
+		System.out.println("Cleared digicode buffered keys.");
+		this.typedBuffer = new char[BUFFER_SIZE];
+	}
+	
+	private void addPasscode(String code) {
+		if(code == null || code.length() != 4) throw new IllegalArgumentException("Code is in invalid format (null or lenght different from 4)");
+		if(this.passcodes.contains(code.toUpperCase().toCharArray())) throw new IllegalArgumentException("Code already added.");
+		this.passcodes.add(code.toUpperCase().toCharArray());
+	}
+	
+	/**
+	 * Used when user try to validate buffered keys
+	 * Toggle alarm if passcode is valid
+	 */
+	private void onValidate() {
+		if(this.nTypedBuffer != 4) {
+			throw new IllegalStateException("Digicode used a != 4 passcode.");
+		}
+		
+		for(char[] code : this.passcodes) {
 			if(this.typedBuffer == code) {
-				//Valid
+				this.secuManager.toggleAlarm(new String(code));
+				break;//Multiple code are valid ?
 			}
 		}
 	}
@@ -160,6 +214,7 @@ public class Digicode {
 			po.setMode(PinMode.DIGITAL_OUTPUT);
 			po.setState(true);
 		}
+		
 		for(GpioPinDigitalMultipurpose po : padc) {
 			po.setState(false);
 			po.setMode(PinMode.DIGITAL_INPUT);

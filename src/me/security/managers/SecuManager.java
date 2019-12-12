@@ -45,7 +45,7 @@ public class SecuManager {
 		this.digicode = new Digicode
 				(this,
 				GPIO, 
-				"1574".toCharArray(), 
+				"1574", 
 				new Pin[]{RaspiPin.GPIO_14, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05}, 
 				new Pin[]{RaspiPin.GPIO_04, RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_00});
 	}
@@ -60,6 +60,13 @@ public class SecuManager {
 		this.db.alert(sensorName, type);
 		this.redLed.freezeThenWait();
 		this.blueLed.hide();
+	}
+
+	public void toggleAlarm(String code) {
+		this.enabled = !enabled;
+		String preparedMessage = "Alarm toggled " + (enabled ? "ON" : "OFF") + " with code : " + code;
+		this.db.rawLog(preparedMessage);
+		this.notif.triggerIFTTT(preparedMessage);
 	}
 	
 }
