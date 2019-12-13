@@ -222,7 +222,7 @@ public class Digicode {
 		if(!goodPasscode) {
 			this.timeLastError = System.currentTimeMillis();
 			this.numberOfError++;
-			this.secuManager.getDb().rawLog("Passcode error on Digicode");
+			this.secuManager.getDb().log("Passcode error on Digicode");
 			this.secuManager.getNotif().triggerIFTTT("Erreur de digicode...");
 			this.secuManager.getBuzzer().buzz();
 		}

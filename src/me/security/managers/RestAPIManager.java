@@ -1,22 +1,28 @@
 package me.security.managers;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.Scanner;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import me.security.hardware.sensors.Sensor;
+import me.security.managers.DatabaseManager.Log;
 
 /**
  * @author Ekinoxx
  *
  */
 public class RestAPIManager {
+	
 	private static final int PORT = 8080;
+	private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 	
 	private final SecuManager security;
 
@@ -25,11 +31,9 @@ public class RestAPIManager {
 		try (ServerSocket server = new ServerSocket(PORT)) {
 			System.out.println("Listening on port " + server.getLocalPort());
 
-			int threadCount = 0;
 			while (true) {
-				ConnectionThread thread = new ConnectionThread(server.accept(), threadCount);
+				ConnectionThread thread = new ConnectionThread(this.security, server.accept());
 				thread.start();
-				threadCount++;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -37,18 +41,19 @@ public class RestAPIManager {
 	}
 
 	static class ConnectionThread extends Thread {
+		
+		private final SecuManager security;
 		private Socket client;
-		private int counter;
 
-		public ConnectionThread(Socket client, int counter) {
+		public ConnectionThread(SecuManager security, Socket client) {
+			this.security = security;
 			this.client = client;
-			this.counter = counter;
 		}
 
 		public void run() {
-			String clientIP = client.getInetAddress().toString();
-			System.out.println("Connection " + counter + " from " + clientIP);
-			try (InputStream input = client.getInputStream(); OutputStream output = client.getOutputStream()) {
+			String clientIP = this.client.getInetAddress().toString();
+			System.out.println("Connection from " + clientIP);
+			try (InputStream input = this.client.getInputStream(); OutputStream output = client.getOutputStream()) {
 				Scanner inputReader = new Scanner(input);
 				inputReader.useDelimiter("\n");
 				if (!inputReader.hasNext()) {
@@ -58,19 +63,33 @@ public class RestAPIManager {
 				}
 
 				String url = inputReader.next().split(" ")[1];
-				
 				switch(url) {
 				
+				case "/isEnabled":
+					sendText(output, this.security.isEnabled() + "");
+					break;
+				
 				case "/notify":
-					sendText(output, "[{\"id_alerte\":1,\"date\":1576166249948,\"type\":\"motion\"}]");
+					List<Log> logs = this.security.getDb().getLast10Logs();
+					sendText(output, GSON.toJson(logs));
 					break;
 					
 				case "/sensors":
-					sendText(output, "[{\"id\":1,\"type\":\"MOTION\",\"lastActive\":1576165908504,\"isEnabled\":true},{\"id\":2,\"type\":\"MOTION\",\"lastActive\":1576234568504,\"isEnabled\":true},{\"id\":3,\"type\":\"GAS\",\"lastActive\":-1,\"isEnabled\":true},{\"id\":4,\"type\":\"HEAT\",\"lastActive\":-1,\"isEnabled\":false},{\"id\":5,\"type\":\"MOTION\",\"lastActive\":1576146546544,\"isEnabled\":true}]");
+					sendText(output, GSON.toJson(this.security.getSensors()));
 					break;
 				
 				default:
-					sendNotFound(output, url);
+					if(url.startsWith("/sensor/")) {
+						try {
+							int id = Integer.parseInt(url.replaceFirst("/sensor/", ""));
+							for(Sensor s : this.security.getSensors()) {
+							}
+						} catch(NumberFormatException ex) {
+							sendNotFound(output, url);
+						}
+					} else {
+						sendNotFound(output, url);
+					}
 					break;
 				}
 
