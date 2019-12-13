@@ -71,14 +71,14 @@ public class SecuManager {
 		this.sensors.add(new Sensor(this, "Gaz salon", SensorType.GAS, RaspiPin.GPIO_24));
 	}
 	
-	public void triggerAlarm(String sensorName, SensorType type) {
+	public void triggerAlarm(String sensorName, String alertMessage) {
 		if (!enabled) {
-			System.out.println("Detection with disabled system. (" + sensorName + " | " + type.getAlertMessage() + ")");
+			System.out.println("Detection with disabled system. (" + sensorName + " | " + alertMessage + ")");
 			return;
 		}
 		
-		this.notif.triggerAll("Détection d'un problème à " + sensorName + " : " + type.getAlertMessage());
-		this.db.alert(sensorName, type);
+		this.notif.triggerAll("Détection d'un problème à " + sensorName + " : " + alertMessage);
+		this.db.alert(sensorName, alertMessage);
 		this.alarm.flashingAlarm();
 		this.redLed.freezeThenWait();
 		this.blueLed.hide();

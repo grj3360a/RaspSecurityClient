@@ -51,22 +51,43 @@ public class RestAPIManager {
 		}
 
 		public void run() {
-			String clientIP = this.client.getInetAddress().toString();
-			System.out.println("Connection from " + clientIP);
-			try (InputStream input = this.client.getInputStream(); OutputStream output = client.getOutputStream()) {
-				Scanner inputReader = new Scanner(input);
+			//String clientIP = this.client.getInetAddress().toString();
+			//System.out.println("Connection from " + clientIP);
+			
+			InputStream input = null;
+			OutputStream output = null;
+			Scanner inputReader = null;
+			
+			try {
+				input = this.client.getInputStream();
+				output = this.client.getOutputStream();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			} 
+			
+			try {
+				inputReader = new Scanner(input);
 				inputReader.useDelimiter("\n");
 				if (!inputReader.hasNext()) {
-					sendNotFound(output, "?");
-					inputReader.close();
-					return;
+					throw new Exception("Input reader has nothing.");
 				}
 
 				String url = inputReader.next().split(" ")[1];
 				switch(url) {
 				
-				case "/isEnabled":
+				case "/alarm":
 					sendText(output, this.security.isEnabled() + "");
+					break;
+					
+				case "/alarm/toggle":
+					this.security.toggleAlarm("APP.");
+					sendText(output, this.security.isEnabled() + "");
+					break;
+					
+				case "/alarm/test":
+					this.security.triggerAlarm("TEST", "Activation de l'alarme de test.");
+					sendText(output, "true");
 					break;
 				
 				case "/notify":
@@ -81,22 +102,67 @@ public class RestAPIManager {
 				default:
 					if(url.startsWith("/sensor/")) {
 						try {
-							int id = Integer.parseInt(url.replaceFirst("/sensor/", ""));
+							Sensor target = null;
+							int id = Integer.parseInt(url.split("/")[2]);
 							for(Sensor s : this.security.getSensors()) {
+								if(s.getId() == id) {
+									target = s;
+								}
+							}
+							
+							if(target == null) {
+								throw new IllegalArgumentException(id + "");
+							}
+							
+							switch(url.replaceFirst("/sensor/" + id, "")) {
+							
+							case "/toggle":
+								target.toggle();
+								sendText(output, target.isEnabled() + "");
+								break;
+								
+							//Potentially add other endpoint to manage sensor ?
+								
+							default:
+								sendNotFound(output, url);
+								break;
+							
 							}
 						} catch(NumberFormatException ex) {
-							sendNotFound(output, url);
+							throw new Exception("Invalid sensor ID.");
 						}
 					} else {
-						sendNotFound(output, url);
+						throw new IllegalAccessException("Unknown endpoint.");
 					}
 					break;
 				}
 
 				inputReader.close();
-			} catch (IOException e) {
+			} catch (IllegalAccessException e) {
 				e.printStackTrace();
+				sendNotFound(output, e.getMessage());
+			} catch (Exception e) {
+				e.printStackTrace();
+				sendError(output, e.getMessage());
+			} finally {
+				if(inputReader != null)
+					inputReader.close();
+				
+				try {
+					output.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
+		}
+		
+		private void sendError(OutputStream output, String msg) {
+			PrintStream out = new PrintStream(output);
+			out.println("HTTP/1.0 500 Internal Server Error");
+			out.println("");
+			out.println("" + msg);
+			out.println("");
+			out.flush();
 		}
 		
 		private void sendNotFound(OutputStream output, String url) {

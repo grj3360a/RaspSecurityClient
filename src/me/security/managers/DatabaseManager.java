@@ -13,8 +13,6 @@ import java.util.List;
 
 import com.google.gson.annotations.Expose;
 
-import me.security.hardware.sensors.SensorType;
-
 /**
  * @author Geraldes Jocelyn
  * @since 24/11/2019
@@ -23,7 +21,7 @@ public class DatabaseManager implements AutoCloseable {
 	
 	private final Connection connection;
 	
-	public DatabaseManager(String domain, String db, String user, String password) throws SQLException, ClassNotFoundException {
+	public DatabaseManager(String domain, String db, String user, String password) throws SQLException {
 		connection = DriverManager.getConnection("jdbc:mysql://" + domain + ":3306/" + db, user, password);
 	}
 	
@@ -31,8 +29,8 @@ public class DatabaseManager implements AutoCloseable {
 		this.rawLog(false, info);
 	}
 
-	public void alert(String sensorName, SensorType type) {
-		this.rawLog(true, "Detection " + sensorName + " (" + type.getAlertMessage() + ")");
+	public void alert(String sensorName, String alertMessage) {
+		this.rawLog(true, "Detection " + sensorName + " (" + alertMessage + ")");
 	}
 	
 	private void rawLog(boolean relatedToSensor, String info) throws IllegalArgumentException {

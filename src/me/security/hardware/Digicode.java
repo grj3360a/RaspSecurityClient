@@ -3,7 +3,6 @@ package me.security.hardware;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalMultipurpose;
 import com.pi4j.io.gpio.Pin;
@@ -13,7 +12,6 @@ import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
-import me.security.hardware.sensors.SensorType;
 import me.security.managers.SecuManager;
 
 /**
@@ -32,11 +30,11 @@ public class Digicode {
 	private final SecuManager secuManager;
 	
 	private List<char[]> passcodes;//Valid codes to enable/disable alarm
-	private char[] typedBuffer = new char[BUFFER_SIZE];//Typed keys buffer
-	private char nTypedBuffer = 0;//Number of key already typed
+	private char[] typedBuffer;//Typed keys buffer
+	private char nTypedBuffer;//Number of key already typed
 	
-	private long timeLastError = 0;
-	private int numberOfError = 0;
+	private long timeLastError;
+	private int numberOfError;
 
 	private GpioPinDigitalMultipurpose padl1;
 	private GpioPinDigitalMultipurpose padl2;
@@ -58,9 +56,15 @@ public class Digicode {
 		if(lines == null || lines.length != 4) throw new IllegalArgumentException();
 		if(columns == null || columns.length != 4) throw new IllegalArgumentException();
 		
+		this.typedBuffer = new char[BUFFER_SIZE];
+		this.nTypedBuffer = 0;
+		
 		this.secuManager = secuManager;
 		this.passcodes = new ArrayList<char[]>();
 		this.addPasscode(defaultCode);
+		
+		this.timeLastError = 0;
+		this.numberOfError = 0;
 		
 		this.padl1 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[0], "0", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
 		this.padl2 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[1], "1", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
@@ -188,6 +192,7 @@ public class Digicode {
 	
 	private void cleanBuffer() {
 		System.out.println("Cleared digicode buffered keys.");
+		this.nTypedBuffer = 0;
 		this.typedBuffer = new char[BUFFER_SIZE];
 	}
 	
@@ -228,7 +233,7 @@ public class Digicode {
 		}
 		
 		if(this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
-			this.secuManager.triggerAlarm("Nombre d'erreur", SensorType.DIGICODE);
+			this.secuManager.triggerAlarm("Nombre d'erreur", "Tentative de désactivation de l'alarme hasardeuse !");
 		}
 	}
 

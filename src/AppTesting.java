@@ -22,12 +22,12 @@ public class AppTesting {
 						 	   {'7', '8', '9', 'C'},
 						 	   {'*', '0', '#', 'D'}};
 		
-		GpioPinDigitalOutput blueLed = GPIO.provisionDigitalOutputPin(RaspiPin.GPIO_25, PinState.LOW);
+		/*GpioPinDigitalOutput blueLed = GPIO.provisionDigitalOutputPin(RaspiPin.GPIO_25, PinState.LOW);
 		GpioPinDigitalOutput yellowLed = GPIO.provisionDigitalOutputPin(RaspiPin.GPIO_24, PinState.LOW);
-		final GpioPinDigitalOutput greenLed = GPIO.provisionDigitalOutputPin(RaspiPin.GPIO_23, PinState.LOW);
+		final GpioPinDigitalOutput greenLed = GPIO.provisionDigitalOutputPin(RaspiPin.GPIO_23, PinState.LOW);*/
 		final GpioPinDigitalOutput redLed = GPIO.provisionDigitalOutputPin(RaspiPin.GPIO_22, PinState.LOW);
 		
-		final GpioPinDigitalOutput buzzer = GPIO.provisionDigitalOutputPin(RaspiPin.GPIO_26, PinState.LOW);
+		//final GpioPinDigitalOutput buzzer = GPIO.provisionDigitalOutputPin(RaspiPin.GPIO_26, PinState.LOW);
 		
 		GpioPinDigitalInput movement = GPIO.provisionDigitalInputPin(RaspiPin.GPIO_29);
 		

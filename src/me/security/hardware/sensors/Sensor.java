@@ -40,24 +40,32 @@ public class Sensor {
 			@Override
 			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
 				if(event.getEdge() == PinEdge.FALLING) return;
-				Sensor.this.detect();
+				Sensor.this.trigger();
 			}
 		});
 	}
-	
-	public void toggle() {
-		this.isEnabled = !this.isEnabled;
+
+	public int getId() {
+		return this.id;
 	}
 	
 	public SensorType getType() {
 		return type;
 	}
 	
-	public boolean detect() {
+	public void toggle() {
+		this.isEnabled = !this.isEnabled;
+	}
+	
+	public boolean trigger() {
 		if(!isEnabled && lastActivated + this.getType().getTimeBetweenActivation() < System.currentTimeMillis()) return false;
 		this.lastActivated = System.currentTimeMillis();
-		this.manager.triggerAlarm(this.name, this.getType());
+		this.manager.triggerAlarm(this.name, this.getType().getAlertMessage());
 		return true;
+	}
+
+	public boolean isEnabled() {
+		return this.isEnabled;
 	}
 	
 }

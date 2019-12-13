@@ -1,11 +1,5 @@
 package me.security.hardware;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-
-import com.hopding.jrpicam.RPiCamera;
-import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-
 /**
  * @author Geraldes Jocelyn
  * @since 24/11/2019
@@ -15,8 +9,8 @@ import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
  */
 public class Camera {
 	
-	public Camera() throws FailedToRunRaspistillException {
-		RPiCamera piCamera = new RPiCamera("/tmp");
+	public Camera() {
+		/*RPiCamera piCamera = new RPiCamera("/tmp");
 		
 		try {
 			BufferedImage image = piCamera.takeBufferedStill();
@@ -24,7 +18,7 @@ public class Camera {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 }

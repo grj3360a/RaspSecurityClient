@@ -11,8 +11,7 @@ public enum SensorType {
 	OPEN(0, "Intrusion par une fenêtre détecté !"),
 	MOTION(1000L * 60 * 4, "Mouvement dans la maison détecté !"),
 	HEAT(1000L * 60 * 4, "Chaleur anormale détecté !"),
-	GAS(1000L * 60 * 4, "Présence anormale de gaz détecté !"),
-	DIGICODE(0, "Tentative de désactivation de l'alarme hasardeuse !");
+	GAS(1000L * 60 * 4, "Présence anormale de gaz détecté !");
 	
 	private final long timeBetweenActivation;
 	private final String alert;
