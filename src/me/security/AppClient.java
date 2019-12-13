@@ -149,7 +149,7 @@ public class AppClient {
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(2000L);//Just Waiting for system to be setup.
+					Thread.sleep(3000L);//Just Waiting for system to be setup.
 					
 					Field f = SecuManager.class.getDeclaredField("digicode");
 					f.setAccessible(true);
