@@ -19,12 +19,17 @@ import com.google.gson.annotations.Expose;
  */
 public class DatabaseManager implements AutoCloseable {
 	
-	private final Connection connection;
+	private Connection connection;
 	
 	public DatabaseManager(String domain, String db, String user, String password) throws SQLException {
-		connection = DriverManager.getConnection("jdbc:mysql://" + domain + ":3306/" + db, user, password);
+		initializeConnection(domain, db, user, password);
 	}
 	
+	protected void initializeConnection(String domain, String db, String user, String password) throws SQLException {
+		DriverManager.setLoginTimeout(1);
+		connection = DriverManager.getConnection("jdbc:mysql://" + domain + ":3306/" + db, user, password);
+	}
+
 	public void log(String info) throws IllegalArgumentException {
 		this.rawLog(false, info);
 	}
@@ -33,7 +38,7 @@ public class DatabaseManager implements AutoCloseable {
 		this.rawLog(true, "Detection " + sensorName + " (" + alertMessage + ")");
 	}
 	
-	private void rawLog(boolean relatedToSensor, String info) throws IllegalArgumentException {
+	protected void rawLog(boolean relatedToSensor, String info) throws IllegalArgumentException {
 		if(info == null) throw new IllegalArgumentException();
 		System.out.println(info);
 		try {
@@ -71,7 +76,7 @@ public class DatabaseManager implements AutoCloseable {
 	public void close() {
 		try {
 			System.out.println("Closing connection...");
-			if(!connection.isClosed()) connection.close();
+			if(connection != null && !connection.isClosed()) connection.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -86,7 +91,7 @@ public class DatabaseManager implements AutoCloseable {
 		@Expose private final boolean relatedToSensor;
 		@Expose private final String info;
 		
-		private Log(int id, Timestamp time, boolean relatedToSensor, String info) {
+		public Log(int id, Timestamp time, boolean relatedToSensor, String info) {
 			this.id = id;
 			this.time = time.getTime();
 			this.relatedToSensor = relatedToSensor;

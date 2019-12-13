@@ -1,6 +1,7 @@
 package me.security.hardware;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.pi4j.io.gpio.GpioPinDigitalInput;
@@ -121,7 +122,7 @@ public class Digicode {
 					
 					try {
 						if(numberOfInput > 1 || numberOfInput == 0) {
-							throw new Exception((numberOfInput > 0 ? "Multiple" : "No") + " input in lines... Unable to calculate key from digicode.");
+							throw new Exception((numberOfInput > 0 ? "Multiple" : "No") + " input in lines (" + pc.getPin().getName() + ")... Unable to calculate key from digicode.");
 						}
 						
 						for(GpioPinDigitalMultipurpose po : padl) {
@@ -216,7 +217,7 @@ public class Digicode {
 		boolean goodPasscode = false;
 		
 		for(char[] code : this.passcodes) {
-			if(this.typedBuffer == code && !goodPasscode) {
+			if(Arrays.equals(code, this.typedBuffer) && !goodPasscode) {
 				this.secuManager.toggleAlarm(new String(code));
 				goodPasscode = true;
 				this.timeLastError = 0;

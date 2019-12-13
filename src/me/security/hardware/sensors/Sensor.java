@@ -17,7 +17,6 @@ public class Sensor {
 	
 	public static int AUTO_INCREMENT = 0;
 	
-	
 	@Expose private final int id = (AUTO_INCREMENT = AUTO_INCREMENT + 1);
 	@Expose private boolean isEnabled = false;
 	@Expose private long lastActivated = -1L;
@@ -67,5 +66,5 @@ public class Sensor {
 	public boolean isEnabled() {
 		return this.isEnabled;
 	}
-	
+
 }

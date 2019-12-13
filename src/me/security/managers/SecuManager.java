@@ -38,6 +38,8 @@ public class SecuManager {
 	private Digicode digicode;
 	
 	public SecuManager(NotificationManager notifications, DatabaseManager db) throws UnsatisfiedLinkError {
+		if(notifications == null) throw new IllegalArgumentException();
+		if(db == null) throw new IllegalArgumentException();
 		this.notif = notifications;
 		this.db = db;
 

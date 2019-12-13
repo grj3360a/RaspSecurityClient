@@ -2,22 +2,16 @@ package me.security;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.List;
 
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioProvider;
-import com.pi4j.io.gpio.SimulatedGpioProvider;
-
-import me.security.hardware.Digicode;
 import me.security.managers.DatabaseManager;
 import me.security.managers.NotificationManager;
 import me.security.managers.RestAPIManager;
 import me.security.managers.SecuManager;
 import me.security.notification.NotificationFreeAPI;
 import me.security.notification.NotificationIFTTT;
+import me.security.windows.WindowsMode;
 
 /**
  * @author Geraldes Jocelyn
@@ -31,7 +25,7 @@ public class AppClient {
 	public static void main(String[] args) throws Exception {
 		for(String s : args) {
 			if(s.toLowerCase().equals("--windows")) {
-				windowsModeSetup();
+				WindowsMode.windowsModeSetup();
 			}
 		}
 		
@@ -136,39 +130,4 @@ public class AppClient {
 		
 		return new NotificationIFTTT(iftttInfo.get(0), iftttInfo.get(1));
 	}
-	
-	public static void windowsModeSetup() {
-		WINDOWS_MODE = true;
-        GpioProvider provider = new SimulatedGpioProvider();
-        GpioFactory.setDefaultProvider(provider);
-        System.out.println("Enabled system in windows mode, simulated environment.");
-        
-        //Activating simulation.
-        new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(3000L);//Just Waiting for system to be setup.
-					
-					Field f = SecuManager.class.getDeclaredField("digicode");
-					f.setAccessible(true);
-					Digicode d = (Digicode) f.get(security);
-					
-					Method m = Digicode.class.getDeclaredMethod("input", char.class);
-					m.setAccessible(true);
-					
-					m.invoke(d, '1');
-					m.invoke(d, '5');
-					m.invoke(d, '7');
-					m.invoke(d, '4');
-					m.invoke(d, '#');
-					
-				} catch (Exception e) {//We don't even care
-					e.printStackTrace();
-				}
-			}
-		}).start();;
-	}
-
 }
