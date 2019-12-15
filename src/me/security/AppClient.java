@@ -1,7 +1,6 @@
 package me.security;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -52,10 +51,10 @@ public class AppClient {
 		 */
 		NotificationManager notif = new NotificationManager();
 		
-		NotificationFreeAPI fm = generateFree();
+		NotificationFreeAPI fm = NotificationFreeAPI.generateFromFile();
 		if(fm != null) notif.add(fm);
 		
-		NotificationIFTTT ifttt = generateIFTTT();
+		NotificationIFTTT ifttt = NotificationIFTTT.generateFromFile();
 		if(ifttt != null) notif.add(ifttt);
 		
 		/*
@@ -74,60 +73,5 @@ public class AppClient {
 		while(true) { // We need this thread to sleep while WiringPi is running in background.
 			Thread.sleep(1000L);
 		}
-	}
-	
-	public static NotificationFreeAPI generateFree() {
-		File freePwd = new File("./free.password");
-
-		if(!freePwd.exists() || !freePwd.canRead()) {
-			System.out.println("Free password file doesn't exist");
-			return null;
-		}
-		
-		List<String> freeInfo;
-		try {
-			freeInfo = Files.readAllLines(freePwd.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-			
-		if(freeInfo.size() != 2) {
-			System.out.println("Free password file doesn't respect defined format");
-			return null;
-		}
-		
-		try {
-			Integer.parseInt(freeInfo.get(0));
-		} catch(NumberFormatException e) {
-			System.out.println("Free password file have invalid first line");
-			return null;
-		}
-		
-		return new NotificationFreeAPI(Integer.parseInt(freeInfo.get(0)), freeInfo.get(1));
-	}
-	
-	public static NotificationIFTTT generateIFTTT() {
-		File iftttPwd = new File("./ifttt.password");
-
-		if(!iftttPwd.exists() || !iftttPwd.canRead()) {
-			System.out.println("IFTTT password file doesn't exist");
-			return null;
-		}
-		
-		List<String> iftttInfo;
-		try {
-			iftttInfo = Files.readAllLines(iftttPwd.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-			
-		if(iftttInfo.size() != 2) {
-			System.out.println("IFTTT password file doesn't respect defined format");
-			return null;
-		}
-		
-		return new NotificationIFTTT(iftttInfo.get(0), iftttInfo.get(1));
 	}
 }

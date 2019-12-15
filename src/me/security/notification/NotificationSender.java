@@ -14,6 +14,15 @@ public abstract class NotificationSender {
 	 * @throws Exception If value doesn't respect format of NotificationSender
 	 */
 	public abstract void trigger(String value) throws Exception;
+	
+	/**
+	 * Send a notification to this particular implementation of NotificationSender
+	 * @param valuse The messages to send
+	 * @throws Exception If value doesn't respect format of NotificationSender
+	 */
 	public abstract void trigger(List<String> values) throws Exception;
+	
+	//Must have because of NotificationManager "contains" usage
+	public abstract boolean equals(Object o);
 	
 }

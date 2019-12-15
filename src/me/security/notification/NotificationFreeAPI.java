@@ -1,7 +1,9 @@
 package me.security.notification;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,37 @@ import org.apache.http.impl.client.HttpClientBuilder;
  * @since 24/11/2019
  */
 public class NotificationFreeAPI extends NotificationSender {
+	
+	public static NotificationFreeAPI generateFromFile() {
+		File freePwd = new File("./free.password");
+
+		if(!freePwd.exists() || !freePwd.canRead()) {
+			System.out.println("Free password file doesn't exist");
+			return null;
+		}
+		
+		List<String> freeInfo;
+		try {
+			freeInfo = Files.readAllLines(freePwd.toPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+			
+		if(freeInfo.size() != 2) {
+			System.out.println("Free password file doesn't respect defined format");
+			return null;
+		}
+		
+		try {
+			Integer.parseInt(freeInfo.get(0));
+		} catch(NumberFormatException e) {
+			System.out.println("Free password file have invalid first line");
+			return null;
+		}
+		
+		return new NotificationFreeAPI(Integer.parseInt(freeInfo.get(0)), freeInfo.get(1));
+	}
 
 	private final HttpClient httpClient;
 	private final int user;
@@ -32,6 +65,7 @@ public class NotificationFreeAPI extends NotificationSender {
 	 */
 	public NotificationFreeAPI(int user, String password) throws IllegalArgumentException {
 		if(user >= 100000000 || user <= 00100000) throw new IllegalArgumentException("User id not valid size"); // Magic values to mask FreeAPI user
+		if(password == null) throw new IllegalArgumentException("Password is null");
 		if(password.length() != 14) throw new IllegalArgumentException("Password not valid size");//Password will always be 14 chars
 		this.httpClient = HttpClientBuilder.create().build();
 		this.user = user;
@@ -86,6 +120,14 @@ public class NotificationFreeAPI extends NotificationSender {
 	@Override
 	public void trigger(List<String> values) throws Exception {
 		trigger(values.stream().collect(Collectors.joining(" ")));
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if(o == null) return false;
+		if(!(o instanceof NotificationFreeAPI)) return false;
+		NotificationFreeAPI notif = (NotificationFreeAPI) o;
+		return notif.user == this.user && notif.password.equals(this.password);
 	}
 	
 }
