@@ -1,4 +1,4 @@
-package me.security.hardware.elements;
+package me.security.hardware;
 
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
@@ -18,12 +18,12 @@ public class DisplayElement {
 		return this.pin;
 	}
 
-	public void hide() {
+	public void off() {
 		this.pin.blink(0, 0L);
 		this.pin.setState(false);
 	}
 	
-	public void display() {
+	public void on() {
 		this.pin.blink(0, 0L);
 		this.pin.setState(true);
 	}
@@ -34,6 +34,10 @@ public class DisplayElement {
 	
 	public void blinkIndefinitly() {
 		this.getPin().blink(600, Long.MAX_VALUE);
+	}
+	
+	public void flashingBuzz() {
+		this.getPin().blink(800L, 6 * 1000L);
 	}
 	
 }

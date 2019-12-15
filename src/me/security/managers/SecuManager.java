@@ -9,9 +9,7 @@ import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 
 import me.security.hardware.Digicode;
-import me.security.hardware.elements.Alarm;
-import me.security.hardware.elements.Buzzer;
-import me.security.hardware.elements.Led;
+import me.security.hardware.DisplayElement;
 import me.security.hardware.sensors.Sensor;
 import me.security.hardware.sensors.SensorType;
 
@@ -29,11 +27,11 @@ public class SecuManager {
 	private boolean alarmTriggered = false;
 	
 	private List<Sensor> sensors;
-	private Led blueLed;
-	private Led redLed;
+	private DisplayElement blueLed;
+	private DisplayElement redLed;
 
-	private Alarm alarm;
-	private Buzzer buzzer;
+	private DisplayElement alarm;
+	private DisplayElement buzzer;
 	
 	private Digicode digicode;
 	
@@ -51,13 +49,13 @@ public class SecuManager {
 	}
 	
 	public void initializeHardware() {
-		this.blueLed = new Led(this, RaspiPin.GPIO_25);
+		this.blueLed = new DisplayElement(this, RaspiPin.GPIO_25);
 		this.blueLed.blinkIndefinitly();
-		this.redLed = new Led(this, RaspiPin.GPIO_22);
-		this.redLed.hide();
+		this.redLed = new DisplayElement(this, RaspiPin.GPIO_22);
+		this.redLed.off();
 
-		this.alarm = new Alarm(this, RaspiPin.GPIO_27);
-		this.buzzer = new Buzzer(this, RaspiPin.GPIO_26);
+		this.alarm = new DisplayElement(this, RaspiPin.GPIO_27);
+		this.buzzer = new DisplayElement(this, RaspiPin.GPIO_26);
 		
 		this.digicode = new Digicode
 				(this,
@@ -82,16 +80,16 @@ public class SecuManager {
 		this.notif.triggerAll("Détection d'un problème à " + sensorName + " : " + alertMessage);
 		this.db.alert(sensorName, alertMessage);
 		this.alarm.blinkIndefinitly();
-		this.redLed.freezeThenWait();
-		this.blueLed.hide();
+		this.redLed.on();
+		this.blueLed.off();
 		this.alarmTriggered = true;
 	}
 
 	public void toggleAlarm(String code) {
 		if(this.enabled && this.alarmTriggered) {
-			this.alarm.hide();
+			this.alarm.off();
 			this.blueLed.blinkIndefinitly();
-			this.redLed.hide();
+			this.redLed.off();
 			this.db.log("Triggered alarm is now controlled by " + code);
 			this.notif.triggerFree("Alarme désactivée après une détection");
 		}
@@ -113,7 +111,7 @@ public class SecuManager {
 		return db;
 	}
 
-	public Buzzer getBuzzer() {
+	public DisplayElement getBuzzer() {
 		return buzzer;
 	}
 
