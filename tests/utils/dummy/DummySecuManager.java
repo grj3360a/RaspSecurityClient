@@ -6,7 +6,10 @@ import me.security.managers.DatabaseManager;
 import me.security.managers.NotificationManager;
 import me.security.managers.SecuManager;
 
-public abstract class DummySecuManager extends SecuManager {
+public class DummySecuManager extends SecuManager {
+
+    public boolean alarmTriggered = false;
+    public boolean alarmToggled = false;
 
 	public DummySecuManager() throws UnsatisfiedLinkError, SQLException {
 		super(new NotificationManager(), new DummyDatabaseManager());
@@ -17,10 +20,18 @@ public abstract class DummySecuManager extends SecuManager {
 	}
 	
 	@Override
-	public void initializeHardware() {}
+	public void initializeHardware() {}//Remove hardware initialization
 	
 	@Override
-	public abstract void triggerAlarm(String sensorName, String alertMessage);
+	public void triggerAlarm(String sensorName, String alertMessage) {
+		alarmTriggered = true;
+	}
+
+	@Override
+	public void toggleAlarm(String code) {
+		alarmToggled = !alarmToggled;
+		alarmTriggered = false;
+	}
 	
 	
 }

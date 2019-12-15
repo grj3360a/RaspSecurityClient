@@ -1,4 +1,5 @@
-package utils.dummy;
+package utils;
+
 
 import java.lang.reflect.Field;
 
@@ -22,7 +23,6 @@ public class JUnitGPIO {
 				f.setAccessible(true);
 				
 				try {
-					System.out.println("unpro: " + f.getName());
 					GpioFactory.getInstance().unprovisionPin((GpioPin) f.get(o));
 				} catch (Exception e) {
 					e.printStackTrace();

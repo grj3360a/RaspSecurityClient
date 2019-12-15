@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,9 +17,8 @@ import com.pi4j.io.gpio.SimulatedGpioProvider;
 
 import me.security.hardware.sensors.Sensor;
 import me.security.hardware.sensors.SensorType;
-import me.security.managers.SecuManager;
+import utils.JUnitGPIO;
 import utils.dummy.DummySecuManager;
-import utils.dummy.JUnitGPIO;
 
 /*
  * Explications sur les difficultées de cette classe :
@@ -30,9 +30,8 @@ import utils.dummy.JUnitGPIO;
 public class SensorTest {
 	
 	private static SimulatedGpioProvider gpio;
-    private static SecuManager secu;
-    private static boolean alarmTriggered;
-    
+	
+    private DummySecuManager secu;
     private Sensor s1;
     private Sensor s2;
     
@@ -40,21 +39,18 @@ public class SensorTest {
     public static void setUpClass() throws Exception {
         gpio = new SimulatedGpioProvider();
         GpioFactory.setDefaultProvider(gpio);
-		secu = new DummySecuManager() {
-
-			@Override
-			public void triggerAlarm(String sensorName, String alertMessage) {
-				alarmTriggered = true;
-			}
-			
-		};
+    }
+    
+    @AfterClass
+    public static void tearDownClass() {
+    	gpio = null;
     }
 	
 	@Before
 	public void setUp() throws Exception {
+		this.secu = new DummySecuManager();
 		this.s1 = new Sensor(secu, "S1", SensorType.MOTION, RaspiPin.GPIO_01);
 		this.s2 = new Sensor(secu, "S2", SensorType.OPEN, RaspiPin.GPIO_02);
-		alarmTriggered = false;
 	}
 
 	@After
@@ -64,6 +60,7 @@ public class SensorTest {
 		Sensor.AUTO_INCREMENT = 0;
 		this.s1 = null;
 		this.s2 = null;
+		this.secu = null;
 	}
 
 	@Test
@@ -92,13 +89,13 @@ public class SensorTest {
 	@Test
 	public void testTrigger() throws InterruptedException {
 		this.s1.toggle();
-		
+
 		gpio.setState(RaspiPin.GPIO_01, PinState.HIGH);
 		gpio.setState(RaspiPin.GPIO_01, PinState.LOW);
-		
-		Thread.sleep(100L);//We have to wait as the SimulatedRaspi is async thread that can't be var synchronized -_-
-		
-		assertTrue(alarmTriggered);
+
+		Thread.sleep(300L);//We have to wait as the SimulatedRaspi is async thread that can't be var synchronized -_-
+
+		assertTrue(secu.alarmTriggered);
 	}
 
 }

@@ -16,6 +16,7 @@ public class Led extends DisplayElement {
 	
 	public void freezeThenWait() {
 		this.getPin().pulse(2000L);
+		this.hide();
 	}
 
 }
