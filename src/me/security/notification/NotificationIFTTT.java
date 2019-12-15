@@ -30,6 +30,7 @@ public class NotificationIFTTT extends NotificationSender {
 		trigger(Arrays.asList(value));
 	}
 
+	@Override
 	public void trigger(List<String> values) throws Exception {
 		HttpPost request = new HttpPost("https://maker.ifttt.com/trigger/" + event + "/with/key/" + key);
 		request.addHeader("content-type", "application/json");
