@@ -43,6 +43,7 @@ public class SensorTest {
     
     @AfterClass
     public static void tearDownClass() {
+		JUnitGPIO.cleanOut(gpio);
     	gpio = null;
     }
 	
@@ -55,8 +56,7 @@ public class SensorTest {
 
 	@After
 	public void tearDown() throws Exception {
-		JUnitGPIO.unprovisionAllPinsOf(this.s1);
-		JUnitGPIO.unprovisionAllPinsOf(this.s2);
+		JUnitGPIO.cleanOut(gpio);
 		Sensor.AUTO_INCREMENT = 0;
 		this.s1 = null;
 		this.s2 = null;
@@ -92,7 +92,7 @@ public class SensorTest {
 
 		gpio.setState(RaspiPin.GPIO_01, PinState.HIGH);
 		gpio.setState(RaspiPin.GPIO_01, PinState.LOW);
-
+		
 		Thread.sleep(300L);//We have to wait as the SimulatedRaspi is async thread that can't be var synchronized -_-
 
 		assertTrue(secu.alarmTriggered);

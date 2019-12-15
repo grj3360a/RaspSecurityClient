@@ -9,6 +9,4 @@ import gpio.SensorTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({ DigicodeTest.class, SensorTest.class })
-public class GPIOTests {
-
-}
+public class GPIOTests {}

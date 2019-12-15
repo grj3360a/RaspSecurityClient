@@ -2,7 +2,9 @@ package utils;
 
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
+import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPin;
 import com.pi4j.io.gpio.GpioProvider;
@@ -13,32 +15,27 @@ import com.pi4j.io.gpio.event.PinListener;
 
 public class JUnitGPIO {
 	
-	/**
-	 */
-	public static void unprovisionAllPinsOf(Object o) {
-		if(o == null) return;
+	public static void cleanOut(GpioProvider p) {
+		p.removeAllListeners();
+		p.shutdown();
 		
-		for(Field f : o.getClass().getDeclaredFields()) {
-			if(GpioPin.class.isAssignableFrom(f.getType())) {
-				f.setAccessible(true);
-				
-				try {
-					GpioFactory.getInstance().unprovisionPin((GpioPin) f.get(o));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-			} else if(GpioPin[].class.isAssignableFrom(f.getType())){
-				f.setAccessible(true);
-				try {
-					GpioPin[] pins = (GpioPin[]) f.get(o);
-					for(GpioPin pin : pins) {
-						GpioFactory.getInstance().unprovisionPin(pin);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+		GpioController gpio = GpioFactory.getInstance();
+		
+    	for(GpioPin pin : new ArrayList<GpioPin>(gpio.getProvisionedPins())) {
+    		gpio.unprovisionPin(pin);
+    	}
+    	
+    	gpio.removeAllListeners();
+    	gpio.removeAllTriggers();
+    	
+    	//This is necessary as we also change the GpioProvider,
+    	//so GpioController will not be affected except if we rebuild it from scratch.
+		try {
+			Field controller = GpioFactory.class.getDeclaredField("controller");
+	    	controller.setAccessible(true);
+	    	controller.set(null, null);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	

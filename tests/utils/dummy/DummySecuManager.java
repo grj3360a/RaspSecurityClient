@@ -24,6 +24,7 @@ public class DummySecuManager extends SecuManager {
 	
 	@Override
 	public void triggerAlarm(String sensorName, String alertMessage) {
+		System.out.println("Alarm triggered");
 		alarmTriggered = true;
 	}
 

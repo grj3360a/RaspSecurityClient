@@ -122,7 +122,7 @@ public class Digicode {
 	}
 	
 	private void input(char c) throws Exception {
-		System.out.println("Just pressed on digicode : " + c);
+		//System.out.println("Just pressed on digicode : " + c);
 		switch(c) {
 
 		case '0':
@@ -170,7 +170,7 @@ public class Digicode {
 	}
 	
 	private void cleanBuffer() {
-		System.out.println("Cleared digicode buffered keys.");
+		//System.out.println("Cleared digicode buffered keys.");
 		this.nTypedBuffer = 0;
 		this.typedBuffer = new char[BUFFER_SIZE];
 	}
@@ -190,7 +190,7 @@ public class Digicode {
 			throw new IllegalStateException("Digicode used a != 4 passcode.");
 		}
 		
-		System.out.println("Validating passcode.");
+		//System.out.println("Validating passcode.");
 		
 		boolean goodPasscode = false;
 		

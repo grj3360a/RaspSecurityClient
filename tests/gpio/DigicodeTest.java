@@ -33,6 +33,7 @@ public class DigicodeTest {
     
     @AfterClass
     public static void tearDownClass() {
+		JUnitGPIO.cleanOut(gpio);
     	gpio = null;
     }
 	
@@ -50,7 +51,7 @@ public class DigicodeTest {
 
 	@After
 	public void tearDown() throws Exception {
-		JUnitGPIO.unprovisionAllPinsOf(this.digi);
+		JUnitGPIO.cleanOut(gpio);
 		this.digi = null;
 		this.secu = null;
 	}
