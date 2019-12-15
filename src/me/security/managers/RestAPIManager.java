@@ -16,8 +16,9 @@ import me.security.hardware.sensors.Sensor;
 import me.security.managers.DatabaseManager.Log;
 
 /**
- * @author Ekinoxx
- *
+ * @author Geraldes Jocelyn
+ * @since 15/12/2019
+ * Manage a web server to answer requests from mobile app
  */
 public class RestAPIManager {
 	
@@ -26,6 +27,10 @@ public class RestAPIManager {
 	
 	private final SecuManager security;
 
+	/**
+	 * Immediatly start a web server on PORT to answer queries from mobile app
+	 * @param security The main SecuManager
+	 */
 	public RestAPIManager(SecuManager security) {
 		this.security = security;
 		try (ServerSocket server = new ServerSocket(PORT)) {
@@ -39,7 +44,10 @@ public class RestAPIManager {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * Manage a specific connection from a single socket
+	 */
 	static class ConnectionThread extends Thread {
 		
 		private final SecuManager security;
@@ -51,9 +59,6 @@ public class RestAPIManager {
 		}
 
 		public void run() {
-			//String clientIP = this.client.getInetAddress().toString();
-			//System.out.println("Connection from " + clientIP);
-			
 			InputStream input = null;
 			OutputStream output = null;
 			Scanner inputReader = null;
@@ -72,9 +77,10 @@ public class RestAPIManager {
 				if (!inputReader.hasNext()) {
 					throw new Exception("Input reader has nothing.");
 				}
-
+				
+				//The logic start here
 				String url = inputReader.next().split(" ")[1];
-				switch(url) {
+				switch(url) { // Switch between different endpoint
 				
 				case "/alarm":
 					sendText(output, this.security.isEnabled() + "");
@@ -156,6 +162,10 @@ public class RestAPIManager {
 			}
 		}
 		
+		/**
+		 * Send error 500 to output stream from the socket
+		 * @param msg The specific problem encountered
+		 */
 		private void sendError(OutputStream output, String msg) {
 			PrintStream out = new PrintStream(output);
 			out.println("HTTP/1.0 500 Internal Server Error");
@@ -165,6 +175,10 @@ public class RestAPIManager {
 			out.flush();
 		}
 		
+		/**
+		 * Send error 404 Not Found to output stream from the socket
+		 * @param url What url was not found
+		 */
 		private void sendNotFound(OutputStream output, String url) {
 			PrintStream out = new PrintStream(output);
 			out.println("HTTP/1.0 404 Not Found");
@@ -174,6 +188,10 @@ public class RestAPIManager {
 			out.flush();
 		}
 
+		/**
+		 * Send ok 200 to output stream from the socket
+		 * @param text Json to answer
+		 */
 		private void sendText(OutputStream output, String text) {
 			PrintStream out = new PrintStream(output);
 			out.println("HTTP/1.0 200 OK");
