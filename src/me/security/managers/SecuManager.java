@@ -8,10 +8,10 @@ import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 
-import me.security.hardware.Alarm;
-import me.security.hardware.Buzzer;
 import me.security.hardware.Digicode;
-import me.security.hardware.Led;
+import me.security.hardware.elements.Alarm;
+import me.security.hardware.elements.Buzzer;
+import me.security.hardware.elements.Led;
 import me.security.hardware.sensors.Sensor;
 import me.security.hardware.sensors.SensorType;
 
@@ -52,7 +52,7 @@ public class SecuManager {
 	
 	public void initializeHardware() {
 		this.blueLed = new Led(this, RaspiPin.GPIO_25);
-		this.blueLed.flashing();
+		this.blueLed.blinkIndefinitly();
 		this.redLed = new Led(this, RaspiPin.GPIO_22);
 		this.redLed.hide();
 
@@ -81,7 +81,7 @@ public class SecuManager {
 		
 		this.notif.triggerAll("Détection d'un problème à " + sensorName + " : " + alertMessage);
 		this.db.alert(sensorName, alertMessage);
-		this.alarm.flashingAlarm();
+		this.alarm.blinkIndefinitly();
 		this.redLed.freezeThenWait();
 		this.blueLed.hide();
 		this.alarmTriggered = true;
@@ -89,7 +89,8 @@ public class SecuManager {
 
 	public void toggleAlarm(String code) {
 		if(this.enabled && this.alarmTriggered) {
-			this.blueLed.flashing();
+			this.alarm.hide();
+			this.blueLed.blinkIndefinitly();
 			this.redLed.hide();
 			this.db.log("Triggered alarm is now controlled by " + code);
 			this.notif.triggerFree("Alarme désactivée après une détection");

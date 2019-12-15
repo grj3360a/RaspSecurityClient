@@ -230,7 +230,7 @@ public class Digicode {
 			this.numberOfError++;
 			this.secuManager.getDb().log("Passcode error on Digicode");
 			this.secuManager.getNotif().triggerIFTTT("Erreur de digicode...");
-			this.secuManager.getBuzzer().buzz();
+			this.secuManager.getBuzzer().pulse();
 		}
 		
 		if(this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
