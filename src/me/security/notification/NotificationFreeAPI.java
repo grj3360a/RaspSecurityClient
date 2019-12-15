@@ -1,6 +1,7 @@
 package me.security.notification;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
@@ -13,6 +14,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.sun.media.sound.InvalidFormatException;
+
 /**
  * Notification implementation of the Free sms api
  * @see https://mobile.free.fr/moncompte/index.php?page=options
@@ -21,35 +24,22 @@ import org.apache.http.impl.client.HttpClientBuilder;
  */
 public class NotificationFreeAPI extends NotificationSender {
 	
-	public static NotificationFreeAPI generateFromFile() {
+	public static NotificationFreeAPI generateFromFile() throws IOException {
 		File freePwd = new File("./free.password");
 
-		if(!freePwd.exists() || !freePwd.canRead()) {
-			System.out.println("Free password file doesn't exist");
-			return null;
-		}
+		if(!freePwd.exists() || !freePwd.canRead())
+			throw new FileNotFoundException("Free password file doesn't exist or cannot be readed");
 		
-		List<String> freeInfo;
-		try {
-			freeInfo = Files.readAllLines(freePwd.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+		List<String> freeInfo = Files.readAllLines(freePwd.toPath());
 			
-		if(freeInfo.size() != 2) {
-			System.out.println("Free password file doesn't respect defined format");
-			return null;
-		}
+		if(freeInfo.size() != 2)
+			throw new InvalidFormatException("Free password file doesn't respect defined format : must have 2 lines");
 		
 		try {
-			Integer.parseInt(freeInfo.get(0));
+			return new NotificationFreeAPI(Integer.parseInt(freeInfo.get(0)), freeInfo.get(1));
 		} catch(NumberFormatException e) {
-			System.out.println("Free password file have invalid first line");
-			return null;
+			throw new InvalidFormatException("Free password file have invalid first line : must be a number");
 		}
-		
-		return new NotificationFreeAPI(Integer.parseInt(freeInfo.get(0)), freeInfo.get(1));
 	}
 
 	private final HttpClient httpClient;

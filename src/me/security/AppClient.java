@@ -1,7 +1,9 @@
 package me.security;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.List;
 
 import me.security.managers.DatabaseManager;
@@ -21,7 +23,7 @@ public class AppClient {
 	public static boolean WINDOWS_MODE = false;
 	private static SecuManager security;
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException, SQLException {//FIXME Removed throws
 		for(String s : args) {
 			if(s.toLowerCase().equals("--windows")) {
 				WindowsMode.windowsModeSetup();
@@ -51,11 +53,19 @@ public class AppClient {
 		 */
 		NotificationManager notif = new NotificationManager();
 		
-		NotificationFreeAPI fm = NotificationFreeAPI.generateFromFile();
-		if(fm != null) notif.add(fm);
+		try {
+			NotificationFreeAPI fm = NotificationFreeAPI.generateFromFile();
+			notif.add(fm);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		NotificationIFTTT ifttt = NotificationIFTTT.generateFromFile();
-		if(ifttt != null) notif.add(ifttt);
+		try {
+			NotificationIFTTT ifttt = NotificationIFTTT.generateFromFile();
+			notif.add(ifttt);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		/*
 		 * Security handler
@@ -71,7 +81,9 @@ public class AppClient {
 		}));
 		
 		while(true) { // We need this thread to sleep while WiringPi is running in background.
-			Thread.sleep(1000L);
+			try {
+				Thread.sleep(1000L);
+			} catch (InterruptedException e) {}
 		}
 	}
 }

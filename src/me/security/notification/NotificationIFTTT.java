@@ -1,6 +1,7 @@
 package me.security.notification;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -12,6 +13,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.sun.media.sound.InvalidFormatException;
+
 /**
  * Notification implementation of the IFFT api
  * @see https://ifttt.com/applets/106799825d
@@ -20,26 +23,16 @@ import org.apache.http.impl.client.HttpClientBuilder;
  */
 public class NotificationIFTTT extends NotificationSender {
 	
-	public static NotificationIFTTT generateFromFile() {
+	public static NotificationIFTTT generateFromFile() throws IOException {
 		File iftttPwd = new File("./ifttt.password");
 
-		if(!iftttPwd.exists() || !iftttPwd.canRead()) {
-			System.out.println("IFTTT password file doesn't exist");
-			return null;
-		}
+		if(!iftttPwd.exists() || !iftttPwd.canRead())
+			throw new FileNotFoundException("IFTTT password file doesn't exist or can't be readed");
 		
-		List<String> iftttInfo;
-		try {
-			iftttInfo = Files.readAllLines(iftttPwd.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+		List<String> iftttInfo = Files.readAllLines(iftttPwd.toPath());
 			
-		if(iftttInfo.size() != 2) {
-			System.out.println("IFTTT password file doesn't respect defined format");
-			return null;
-		}
+		if(iftttInfo.size() != 2)
+			throw new InvalidFormatException("IFTTT password file doesn't respect defined format");
 		
 		return new NotificationIFTTT(iftttInfo.get(0), iftttInfo.get(1));
 	}

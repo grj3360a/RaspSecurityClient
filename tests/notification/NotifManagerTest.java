@@ -31,7 +31,7 @@ public class NotifManagerTest {
 	}
 
 	@Test
-	public void testAdd() {
+	public void testAdd() throws Exception {
 		this.notif.add(NotificationFreeAPI.generateFromFile());
 	}
 
@@ -41,7 +41,7 @@ public class NotifManagerTest {
 	}
 
 	@Test(expected=IllegalArgumentException.class)
-	public void testAddAlreadyContains() {
+	public void testAddAlreadyContains() throws Exception {
 		this.notif.add(NotificationFreeAPI.generateFromFile());
 		this.notif.add(NotificationFreeAPI.generateFromFile());
 	}
@@ -72,7 +72,7 @@ public class NotifManagerTest {
 	}
 
 	@Test
-	public void testToStringWithFree() {
+	public void testToStringWithFree() throws Exception {
 		this.notif.add(NotificationFreeAPI.generateFromFile());
 		assertEquals("Currently active notifications system:\n" + 
 					" - me.security.notification.NotificationFreeAPI\n" + 
