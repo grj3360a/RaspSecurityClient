@@ -37,17 +37,6 @@ public class Digicode {
 	private long timeLastError;
 	private int numberOfError;
 
-	private GpioPinDigitalMultipurpose padl1;
-	private GpioPinDigitalMultipurpose padl2;
-	private GpioPinDigitalMultipurpose padl3;
-	private GpioPinDigitalMultipurpose padl4;
-	
-	private GpioPinDigitalMultipurpose padc1;
-	private GpioPinDigitalMultipurpose padc2;
-	private GpioPinDigitalMultipurpose padc3;
-	private GpioPinDigitalMultipurpose padc4;
-
-	private final GpioPinDigitalMultipurpose[] pad;
 	private final GpioPinDigitalMultipurpose[] padc;
 	private final GpioPinDigitalMultipurpose[] padl;
 	
@@ -67,23 +56,8 @@ public class Digicode {
 		this.timeLastError = 0;
 		this.numberOfError = 0;
 		
-		this.padl1 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[0], "0", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
-		this.padl2 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[1], "1", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
-		this.padl3 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[2], "2", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
-		this.padl4 = secuManager.getGPIO().provisionDigitalMultipurposePin(lines[3], "3", PinMode.DIGITAL_OUTPUT, PinPullResistance.PULL_DOWN);
-		
-		this.padc1 = secuManager.getGPIO().provisionDigitalMultipurposePin(columns[0], "0", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
-		this.padc2 = secuManager.getGPIO().provisionDigitalMultipurposePin(columns[1], "1", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
-		this.padc3 = secuManager.getGPIO().provisionDigitalMultipurposePin(columns[2], "2", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
-		this.padc4 = secuManager.getGPIO().provisionDigitalMultipurposePin(columns[3], "3", PinMode.DIGITAL_INPUT, PinPullResistance.PULL_DOWN);
-
-		this.pad = new GpioPinDigitalMultipurpose[]{padc1, padc2, padc3, padc4, padl1, padl2, padl3, padl4};
-		this.padc = new GpioPinDigitalMultipurpose[]{padc1, padc2, padc3, padc4};
-		this.padl = new GpioPinDigitalMultipurpose[]{padl1, padl2, padl3, padl4};
-		
-		for(GpioPinDigitalMultipurpose g : this.pad) {
-			g.setDebounce(50);
-		}
+		this.padc = new GpioPinDigitalMultipurpose[]{provisionPin(columns, 0), provisionPin(columns, 1), provisionPin(columns, 2), provisionPin(columns, 3)};
+		this.padl = new GpioPinDigitalMultipurpose[]{provisionPin(lines, 0),provisionPin(lines, 1), provisionPin(lines, 2), provisionPin(lines, 3)};
 		
 		this.setupLinesColumnsState();
 		
@@ -191,6 +165,10 @@ public class Digicode {
 		}
 	}
 	
+	private GpioPinDigitalMultipurpose provisionPin(Pin[] pins, int i) {
+		return secuManager.getGPIO().provisionDigitalMultipurposePin(pins[i], i + "", PinMode.DIGITAL_OUTPUT);
+	}
+	
 	private void cleanBuffer() {
 		System.out.println("Cleared digicode buffered keys.");
 		this.nTypedBuffer = 0;
@@ -240,13 +218,17 @@ public class Digicode {
 
 	private void setupLinesColumnsState() {
 		for(GpioPinDigitalMultipurpose po : padl) {
+			po.setDebounce(50);
 			po.setMode(PinMode.DIGITAL_OUTPUT);
+			po.setPullResistance(PinPullResistance.PULL_DOWN);
 			po.setState(true);
 		}
 		
 		for(GpioPinDigitalMultipurpose po : padc) {
-			po.setState(false);
+			po.setDebounce(50);
 			po.setMode(PinMode.DIGITAL_INPUT);
+			po.setPullResistance(PinPullResistance.PULL_DOWN);
+			po.setState(false);
 		}
 	}
 	
