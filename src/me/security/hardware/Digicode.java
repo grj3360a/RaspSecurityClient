@@ -95,8 +95,8 @@ public class Digicode {
 					}
 					
 					try {
-						if(numberOfInput > 1 || numberOfInput == 0) {
-							throw new Exception((numberOfInput > 0 ? "Multiple" : "No") + " input in lines (" + pc.getPin().getName() + ")... Unable to calculate key from digicode.");
+						if(numberOfInput > 1) {
+							throw new Exception("Multiple input in lines (" + pc.getPin().getName() + ")... Unable to calculate key from digicode.");
 						}
 						
 						for(GpioPinDigitalMultipurpose po : padl) {
@@ -175,7 +175,7 @@ public class Digicode {
 		this.typedBuffer = new char[BUFFER_SIZE];
 	}
 	
-	private void addPasscode(String code) {
+	public void addPasscode(String code) {
 		if(code == null || code.length() != 4) throw new IllegalArgumentException("Code is in invalid format (null or lenght different from 4)");
 		if(this.passcodes.contains(code.toUpperCase().toCharArray())) throw new IllegalArgumentException("Code already added.");
 		this.passcodes.add(code.toUpperCase().toCharArray());
