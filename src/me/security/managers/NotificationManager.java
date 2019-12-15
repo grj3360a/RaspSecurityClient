@@ -11,7 +11,6 @@ import me.security.notification.NotificationSender;
 /**
  * @author Geraldes Jocelyn
  * @since 24/11/2019
- * 
  */
 public class NotificationManager {
 	
@@ -74,10 +73,14 @@ public class NotificationManager {
 		triggerSpecific(NotificationIFTTT.class, Arrays.asList(values));
 	}
 	
-	/*
-	 * Private trigger to specific class in senders
+	/**
+	 * Trigger every targeted object with clazz in the senders list with a message
+	 * @param clazz Specific class of targeted NotificationSender,<br>
+	 * 			must be a parent of NotificatioSender class,<br>
+	 * 			clazz can be null
+	 * @param message The message to send to targeted NotificationSender
+	 * @throws IllegalArgumentException message cannot be null or empty
 	 */
-	
 	private void triggerSpecific(Class<? extends NotificationSender> clazz, String message) throws IllegalArgumentException {
 		if(message == null) throw new IllegalArgumentException("Cannot trigger with null message");
 		if(message.length() == 0) throw new IllegalArgumentException("Cannot trigger with empty message");
@@ -93,7 +96,15 @@ public class NotificationManager {
 			}
 		}
 	}
-	
+
+	/**
+	 * Trigger every targeted object with clazz in the senders list with some values
+	 * @param clazz Specific class of targeted NotificationSender,<br>
+	 * 			must be a parent of NotificatioSender class,<br>
+	 * 			clazz can be null
+	 * @param message The values to send to targeted NotificationSender
+	 * @throws IllegalArgumentException values cannot be null or empty
+	 */
 	private void triggerSpecific(Class<? extends NotificationSender> clazz, List<String> values) throws IllegalArgumentException {
 		if(values == null) throw new IllegalArgumentException("values is null");
 		if(values.isEmpty()) throw new IllegalArgumentException("values list is empty");
