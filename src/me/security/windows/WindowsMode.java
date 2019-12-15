@@ -36,12 +36,11 @@ public class WindowsMode {
 					pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_10);
 					Thread.sleep(300L);
 					pressDigicode(provider, RaspiPin.GPIO_02, RaspiPin.GPIO_05);
-					
 				} catch (Exception e) {//We don't even care
 					e.printStackTrace();
 				}
 			}
-		}).start();;
+		}).start();
 	}
 	
 	public static void pressDigicode(GpioProvider provider, Pin c, Pin l) {

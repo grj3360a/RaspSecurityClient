@@ -44,6 +44,12 @@ public class SecuManager {
 		this.GPIO = GpioFactory.getInstance();
 		initializeHardware();
 		
+		try {
+			new RestAPIManager(this);
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
 		this.db.log("Initialized system correctly.\n" + this.notif.toString());
 		this.notif.triggerIFTTT("System initialized.");
 	}

@@ -60,7 +60,7 @@ public class NotificationManager {
 	public void triggerFree(String message) throws IllegalArgumentException {
 		triggerSpecific(NotificationFreeAPI.class, message);
 	}
-
+	
 	/**
 	 * Trigger every NotificationIFTTT object in the senders list with a message
 	 * @param message The message to send to all NotificationFreeAPI

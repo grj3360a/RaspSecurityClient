@@ -27,7 +27,7 @@ public class DatabaseManager implements AutoCloseable {
 	
 	protected void initializeConnection(String domain, String db, String user, String password) throws SQLException {
 		DriverManager.setLoginTimeout(1);
-		connection = DriverManager.getConnection("jdbc:mysql://" + domain + ":3306/" + db, user, password);
+		this.connection = DriverManager.getConnection("jdbc:mysql://" + domain + ":3306/" + db, user, password);
 	}
 
 	public void log(String info) throws IllegalArgumentException {

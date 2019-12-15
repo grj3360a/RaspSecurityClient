@@ -8,7 +8,6 @@ import java.util.List;
 
 import me.security.managers.DatabaseManager;
 import me.security.managers.NotificationManager;
-import me.security.managers.RestAPIManager;
 import me.security.managers.SecuManager;
 import me.security.notification.NotificationFreeAPI;
 import me.security.notification.NotificationIFTTT;
@@ -21,7 +20,6 @@ import me.security.windows.WindowsMode;
 public class AppClient {
 	
 	public static boolean WINDOWS_MODE = false;
-	private static SecuManager security;
 
 	public static void main(String[] args) throws IOException, SQLException {//FIXME Removed throws
 		for(String s : args) {
@@ -46,7 +44,7 @@ public class AppClient {
 		}
 		
 		List<String> dbInfo = Files.readAllLines(dbPassword.toPath());
-		final DatabaseManager db = new DatabaseManager(dbInfo.get(0), dbInfo.get(1), dbInfo.get(2), dbInfo.get(3));
+		DatabaseManager db = new DatabaseManager(dbInfo.get(0), dbInfo.get(1), dbInfo.get(2), dbInfo.get(3));
 		
 		/*
 		 * Notification
@@ -70,8 +68,7 @@ public class AppClient {
 		/*
 		 * Security handler
 		 */
-		security = new SecuManager(notif, db);
-		new RestAPIManager(security);
+		new SecuManager(notif, db);
 		
 		//Adding closing mechanism to shutdown DB connection
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
