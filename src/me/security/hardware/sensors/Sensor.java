@@ -25,6 +25,13 @@ public class Sensor {
 	@Expose private final SensorType type;
 			private GpioPinDigitalInput pin;
 	
+	/**
+	 * Create a sensor handler
+	 * @param manager The linked security manager
+	 * @param name The name of the sensor, or where it is located
+	 * @param type The type of the sensor, this will defined it behavior in triggering
+	 * @param pin The connected pin
+	 */
 	public Sensor(SecuManager manager, String name, SensorType type, Pin pin) {
 		if(manager == null) throw new IllegalArgumentException();
 		if(name == null) throw new IllegalArgumentException();
@@ -44,27 +51,45 @@ public class Sensor {
 		});
 	}
 
+	/**
+	 * @return The auto incremented id of this sensor
+	 */
 	public int getId() {
 		return this.id;
 	}
 	
+	/**
+	 * @see SensorType
+	 * @return The type of this sensor
+	 */
 	public SensorType getType() {
 		return type;
 	}
+
+	/**
+	 * @return True if the sensor is enabled
+	 */
+	public boolean isEnabled() {
+		return this.isEnabled;
+	}
 	
+	/**
+	 * Enable or disable this sensor
+	 */
 	public void toggle() {
 		this.isEnabled = !this.isEnabled;
 	}
 	
+	/**
+	 * Trigger this sensor, this will have an effect only if this sensor is enabled<br>
+	 * and the last time it was activated is superior to the activation threshold is passed 
+	 * @return Return true if this trigger had an effect on the alarm.
+	 */
 	public boolean trigger() {
 		if(!isEnabled && lastActivated + this.getType().getTimeBetweenActivation() < System.currentTimeMillis()) return false;
 		this.lastActivated = System.currentTimeMillis();
 		this.manager.triggerAlarm(this.name, this.getType().getAlertMessage());
 		return true;
-	}
-
-	public boolean isEnabled() {
-		return this.isEnabled;
 	}
 
 }
