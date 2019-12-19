@@ -77,7 +77,7 @@ public class AppClient {
 		    }
 		}));
 		
-		while(true) { // We need this thread to sleep while WiringPi is running in background.
+		while(true) { // We need this in main thread to sleep while WiringPi is running in background.
 			try {
 				Thread.sleep(1000L);
 			} catch (InterruptedException e) {}

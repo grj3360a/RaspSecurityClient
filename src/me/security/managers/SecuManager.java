@@ -21,6 +21,7 @@ public class SecuManager {
 	
 	private final NotificationManager notif;
 	private final DatabaseManager db;
+	private final Thread restApi;
 	private final GpioController GPIO;
 
 	private boolean enabled = false;
@@ -43,15 +44,19 @@ public class SecuManager {
 
 		this.GPIO = GpioFactory.getInstance();
 		initializeHardware();
-		
-		try {
-			new RestAPIManager(this);
-		} catch(Exception ex) {
-			ex.printStackTrace();
-		}
+
 		
 		this.db.log("Initialized system correctly.\n" + this.notif.toString());
 		this.notif.triggerIFTTT("System initialized.");
+		
+		this.restApi = new Thread(new Runnable() {
+				
+			@Override
+			public void run() {
+				new RestAPIManager(SecuManager.this);
+			}
+		});
+		this.restApi.start();
 	}
 	
 	public void initializeHardware() {

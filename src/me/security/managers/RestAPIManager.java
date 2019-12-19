@@ -6,7 +6,11 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 import com.google.gson.Gson;
@@ -24,6 +28,7 @@ public class RestAPIManager {
 	
 	private static final int PORT = 8080;
 	private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+	private static final List<String> AUTHS = Arrays.asList("eaz897hfg654kiu714sf32d1");
 	
 	private final SecuManager security;
 
@@ -75,11 +80,33 @@ public class RestAPIManager {
 				inputReader = new Scanner(input);
 				inputReader.useDelimiter("\n");
 				if (!inputReader.hasNext()) {
+					sendError(output, "Invalid header ?");
 					return;//Ignore invalid request.
 				}
 				
-				//The logic start here
+				
 				String url = inputReader.next().split(" ")[1];
+
+				/*
+				 * Collect every line of the inputReader a Map<String, String>
+				 */
+				String headerLine = null;
+				Map<String, String> headers = new HashMap<String, String>();
+				while(inputReader.hasNext()) {
+					headerLine = inputReader.next();
+					headerLine = headerLine.substring(0, headerLine.length()-1);
+					if(headerLine.contains(": ")) {
+						headers.put(headerLine.split(": ")[0], headerLine.split(": ")[1]);
+					} else {
+						break;
+					}
+				}
+				
+				if(!isAuthed(headers)) {
+					sendNotAuth(output);
+					return;
+				}
+				
 				switch(url) { // Switch between different endpoint
 				
 				case "/alarm":
@@ -161,6 +188,21 @@ public class RestAPIManager {
 				}
 			}
 		}
+
+		/**
+		 * Verify if headers contains valid auth password
+		 * @param headers Headers sended by a request
+		 * @return True if headers contains appPassword & a valid auth password.
+		 */
+		private boolean isAuthed(Map<String, String> headers) {
+			for (Entry<String, String> headerLine : headers.entrySet()) {
+				if (headerLine.getKey().equals("appPassword")) {
+					return AUTHS.contains(headerLine.getValue());
+				}
+			}
+			
+			return false;
+		}
 		
 		/**
 		 * Send error 500 to output stream from the socket
@@ -171,6 +213,16 @@ public class RestAPIManager {
 			out.println("HTTP/1.0 500 Internal Server Error");
 			out.println("");
 			out.println("" + msg);
+			out.println("");
+			out.flush();
+		}
+		
+		/**
+		 * Send error 401 to output stream from the socket
+		 */
+		private void sendNotAuth(OutputStream output) {
+			PrintStream out = new PrintStream(output);
+			out.println("HTTP/1.0 401 Not Authed Correctly");
 			out.println("");
 			out.flush();
 		}
