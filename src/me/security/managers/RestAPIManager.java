@@ -75,7 +75,7 @@ public class RestAPIManager {
 				inputReader = new Scanner(input);
 				inputReader.useDelimiter("\n");
 				if (!inputReader.hasNext()) {
-					throw new Exception("Input reader has nothing.");
+					return;//Ignore invalid request.
 				}
 				
 				//The logic start here
@@ -138,7 +138,7 @@ public class RestAPIManager {
 							throw new Exception("Invalid sensor ID.");
 						}
 					} else {
-						throw new IllegalAccessException("Unknown endpoint.");
+						throw new IllegalAccessException("Unknown endpoint: " + url);
 					}
 					break;
 				}

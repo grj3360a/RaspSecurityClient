@@ -13,8 +13,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import com.sun.media.sound.InvalidFormatException;
-
 /**
  * Notification implementation of the IFFT api
  * @see https://ifttt.com/applets/106799825d
@@ -32,7 +30,7 @@ public class NotificationIFTTT extends NotificationSender {
 		List<String> iftttInfo = Files.readAllLines(iftttPwd.toPath());
 			
 		if(iftttInfo.size() != 2)
-			throw new InvalidFormatException("IFTTT password file doesn't respect defined format");
+			throw new FileNotFoundException("IFTTT password file doesn't respect defined format");
 		
 		return new NotificationIFTTT(iftttInfo.get(0), iftttInfo.get(1));
 	}

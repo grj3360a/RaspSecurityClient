@@ -106,19 +106,19 @@ public class SecuManager {
 	}
 	
 	public GpioController getGPIO() {
-		return GPIO;
+		return this.GPIO;
 	}
 
 	public NotificationManager getNotif() {
-		return notif;
+		return this.notif;
 	}
 
 	public DatabaseManager getDb() {
-		return db;
+		return this.db;
 	}
 
 	public DisplayElement getBuzzer() {
-		return buzzer;
+		return this.buzzer;
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class SecuManager {
 	}
 
 	public boolean isEnabled() {
-		return enabled;
+		return this.enabled;
 	}
 
 }
