@@ -1,5 +1,8 @@
 package me.security.managers;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -18,10 +21,29 @@ import com.google.gson.annotations.Expose;
  * @since 24/11/2019
  */
 public class DatabaseManager implements AutoCloseable {
+
+	public static DatabaseManager generateFromFile() throws IOException, SQLException {
+		File dbPassword = new File("database.password");
+
+		if(!dbPassword.exists() || !dbPassword.canRead()) {
+			System.out.println("Database password file doesn't exist, impossible to launch.");
+			System.exit(-1);
+		}
+		
+		if(Files.readAllLines(dbPassword.toPath()).size() != 4) {
+			System.out.println("Database password file doesn't respect defined format, impossible to launch.");
+			System.exit(-1);
+		}
+		
+		List<String> dbInfo = Files.readAllLines(dbPassword.toPath());
+		return new DatabaseManager(dbInfo.get(0), dbInfo.get(1), dbInfo.get(2), dbInfo.get(3));
+	}
+	
+	//
 	
 	private Connection connection;
 	
-	public DatabaseManager(String domain, String db, String user, String password) throws SQLException {
+	public DatabaseManager(String domain, String db, String user, String password) throws SQLException, IllegalArgumentException {
 		initializeConnection(domain, db, user, password);
 	}
 	
@@ -86,10 +108,10 @@ public class DatabaseManager implements AutoCloseable {
 	 * Only for serialized reading by RestAPIManager
 	 */
 	public static class Log{
-		@Expose private final int id;
-		@Expose private final long time;
-		@Expose private final boolean relatedToSensor;
-		@Expose private final String info;
+		@Expose public final int id;
+		@Expose public final long time;
+		@Expose public final boolean relatedToSensor;
+		@Expose public final String info;
 		
 		public Log(int id, Timestamp time, boolean relatedToSensor, String info) {
 			this.id = id;

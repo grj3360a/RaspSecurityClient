@@ -4,7 +4,8 @@ package me.security.hardware.sensors;
  * @author Geraldes Jocelyn
  * @since 24/11/2019
  * 
- * <b>HAVE TO BE THE SAME AS DATABASE ENUM</b>
+ * <b>Changing this class will probably break Android Application behavior.</b>
+ * This will affect returned data of RestAPI
  */
 public enum SensorType {
 	
@@ -15,6 +16,7 @@ public enum SensorType {
 	
 	private final long timeBetweenActivation;
 	private final String alert;
+	
 	private SensorType(long timeBetweenActivation, String alert) {
 		this.timeBetweenActivation = timeBetweenActivation;
 		this.alert = alert;

@@ -1,10 +1,7 @@
 package me.security;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.SQLException;
-import java.util.List;
 
 import me.security.managers.DatabaseManager;
 import me.security.managers.NotificationManager;
@@ -21,7 +18,7 @@ public class AppClient {
 	
 	public static boolean WINDOWS_MODE = false;
 
-	public static void main(String[] args) throws IOException, SQLException {//FIXME Removed throws
+	public static void main(String[] args) throws IOException, SQLException {
 		for(String s : args) {
 			if(s.toLowerCase().equals("--windows")) {
 				WindowsMode.windowsModeSetup();
@@ -31,20 +28,7 @@ public class AppClient {
 		/*
 		 * Database
 		 */
-		File dbPassword = new File("./database.password");
-
-		if(!dbPassword.exists() || !dbPassword.canRead()) {
-			System.out.println("Database password file doesn't exist, impossible to launch.");
-			System.exit(-1);
-		}
-		
-		if(Files.readAllLines(dbPassword.toPath()).size() != 4) {
-			System.out.println("Database password file doesn't respect defined format, impossible to launch.");
-			System.exit(-1);
-		}
-		
-		List<String> dbInfo = Files.readAllLines(dbPassword.toPath());
-		DatabaseManager db = new DatabaseManager(dbInfo.get(0), dbInfo.get(1), dbInfo.get(2), dbInfo.get(3));
+		DatabaseManager db = DatabaseManager.generateFromFile();
 		
 		/*
 		 * Notification

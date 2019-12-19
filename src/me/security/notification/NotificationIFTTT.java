@@ -22,7 +22,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 public class NotificationIFTTT extends NotificationSender {
 	
 	public static NotificationIFTTT generateFromFile() throws IOException {
-		File iftttPwd = new File("./ifttt.password");
+		File iftttPwd = new File("ifttt.password");
 
 		if(!iftttPwd.exists() || !iftttPwd.canRead())
 			throw new FileNotFoundException("IFTTT password file doesn't exist or can't be readed");

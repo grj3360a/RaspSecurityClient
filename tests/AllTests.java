@@ -3,5 +3,5 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({NotificationTests.class, GPIOTests.class})
+@SuiteClasses({ManagersTests.class, NotificationTests.class, GPIOTests.class})
 public class AllTests {}

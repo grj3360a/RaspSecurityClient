@@ -1,7 +1,7 @@
 /**
  * 
  */
-package notification;
+package managers;
 
 import static org.junit.Assert.assertEquals;
 
