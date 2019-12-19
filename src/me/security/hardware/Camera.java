@@ -3,10 +3,10 @@ package me.security.hardware;
 /**
  * @author Geraldes Jocelyn
  * @since 24/11/2019
- * 
- * As of this date, can't test this because we still don't have a camera.
- * @see https://github.com/Hopding/JRPiCam
+ *  TODO
+ * System has changed, we will probably not use the camera lib already provided.
  */
+@Deprecated
 public class Camera {
 	
 	public Camera() {

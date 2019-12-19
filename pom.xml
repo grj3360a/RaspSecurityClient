@@ -87,13 +87,6 @@
 			<version>8.0.18</version>
 		</dependency>
 
-		<!-- https://jitpack.io/#Hopding/JRPiCam/v1.1.1 -->
-		<dependency>
-			<groupId>com.github.Hopding</groupId>
-			<artifactId>JRPiCam</artifactId>
-			<version>v1.1.1</version>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
