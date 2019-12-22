@@ -14,8 +14,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import com.sun.media.sound.InvalidFormatException;
-
 /**
  * Notification implementation of the Free sms api
  * @see https://mobile.free.fr/moncompte/index.php?page=options
@@ -33,12 +31,12 @@ public class NotificationFreeAPI extends NotificationSender {
 		List<String> freeInfo = Files.readAllLines(freePwd.toPath());
 			
 		if(freeInfo.size() != 2)
-			throw new InvalidFormatException("Free password file doesn't respect defined format : must have 2 lines");
+			throw new FileNotFoundException("Free password file doesn't respect defined format : must have 2 lines");
 		
 		try {
 			return new NotificationFreeAPI(Integer.parseInt(freeInfo.get(0)), freeInfo.get(1));
 		} catch(NumberFormatException e) {
-			throw new InvalidFormatException("Free password file have invalid first line : must be a number");
+			throw new FileNotFoundException("Free password file have invalid first line : must be a number");
 		}
 	}
 

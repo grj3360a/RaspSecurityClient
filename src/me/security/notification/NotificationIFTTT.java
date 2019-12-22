@@ -72,8 +72,13 @@ public class NotificationIFTTT extends NotificationSender {
 		if(hr.getStatusLine().getStatusCode() != 200) throw new Exception("Response from IFTTT doesn't validate!");
 	}
 
+	/**
+	 * Build json with IFTTT format
+	 * @param values The values to format
+	 * @return A json formattend HashMap of these values
+	 */
 	private String buildJson(List<String> values) {
-		if(values.size() > 3) throw new IllegalArgumentException();
+		if(values.size() > 3) throw new IllegalArgumentException("IFTTT doesn't accept more than 3 values.");
 		
 		String json = "";
 		for (int i = 0; i < values.size(); i++) {

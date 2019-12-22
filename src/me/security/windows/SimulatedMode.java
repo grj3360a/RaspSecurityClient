@@ -11,13 +11,13 @@ import com.pi4j.io.gpio.event.PinListener;
 
 import me.security.AppClient;
 
-public class WindowsMode {
+public class SimulatedMode {
 	
-	public static void windowsModeSetup() {
-		AppClient.WINDOWS_MODE = true;
+	public static void setup() {
+		AppClient.SIMULATED_MODE = true;
         GpioProvider provider = new SimulatedGpioProvider();
         GpioFactory.setDefaultProvider(provider);
-        System.out.println("Enabled system in windows mode, simulated environment.");
+        System.out.println("Enabled system in simulated environment.");
         
         //Activating simulation.
         new Thread(new Runnable() {

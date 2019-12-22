@@ -8,7 +8,7 @@ import me.security.managers.NotificationManager;
 import me.security.managers.SecuManager;
 import me.security.notification.NotificationFreeAPI;
 import me.security.notification.NotificationIFTTT;
-import me.security.windows.WindowsMode;
+import me.security.windows.SimulatedMode;
 
 /**
  * @author Geraldes Jocelyn
@@ -16,12 +16,12 @@ import me.security.windows.WindowsMode;
  */
 public class AppClient {
 	
-	public static boolean WINDOWS_MODE = false;
+	public static boolean SIMULATED_MODE = false;
 
 	public static void main(String[] args) throws IOException, SQLException {
 		for(String s : args) {
-			if(s.toLowerCase().equals("--windows")) {
-				WindowsMode.windowsModeSetup();
+			if(s.toLowerCase().equals("--simulated")) {
+				SimulatedMode.setup();
 			}
 		}
 		
