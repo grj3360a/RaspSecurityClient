@@ -10,19 +10,20 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.SimulatedGpioProvider;
 
 import me.security.hardware.Digicode;
+import me.security.managers.NotificationManager;
+import me.security.managers.SecuManager;
 import utils.JUnitGPIO;
-import utils.dummy.DummySecuManager;
+import utils.dummy.DummyDatabaseManager;
 
 public class DigicodeTest {
 	
 	private static SimulatedGpioProvider gpio;
 	
-    private DummySecuManager secu;
+    private SecuManager secu;
     private Digicode digi;
     
     @BeforeClass
@@ -39,14 +40,8 @@ public class DigicodeTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		this.secu = new DummySecuManager();
-		this.digi = new Digicode(
-				this.secu, 
-				"1574", 
-				new Pin[]{RaspiPin.GPIO_14, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05}, 
-				new Pin[]{RaspiPin.GPIO_04, RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_00}
-				);
-		secu.alarmToggled = false;
+		this.secu = new SecuManager(new NotificationManager(), new DummyDatabaseManager());
+		this.digi = this.secu.getDigicode();
 	}
 
 	@After
@@ -65,7 +60,7 @@ public class DigicodeTest {
 		
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 		
-		assertTrue(secu.alarmToggled);
+		assertTrue(secu.isEnabled());
 	}
 
 	@Test
@@ -83,7 +78,7 @@ public class DigicodeTest {
 		
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 		
-		assertTrue(secu.alarmToggled);
+		assertTrue(secu.isEnabled());
 	}
 
 	@Test
@@ -96,7 +91,7 @@ public class DigicodeTest {
 		
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 		
-		assertTrue(secu.alarmToggled);
+		assertTrue(secu.isEnabled());
 	}
 
 	@Test
@@ -113,7 +108,7 @@ public class DigicodeTest {
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 		
-		assertFalse(secu.alarmToggled);
+		assertFalse(secu.isEnabled());
 	}
 
 }

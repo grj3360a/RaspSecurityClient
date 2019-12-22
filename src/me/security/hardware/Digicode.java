@@ -190,6 +190,13 @@ public class Digicode {
 			throw new IllegalStateException("Digicode used a != 4 passcode.");
 		}
 		
+		if(this.numberOfError >= MAXIMUM_NUMBER_OF_TRY && this.timeSinceLastError() < 1000L * 30) {
+			this.secuManager.getDb().log("Passcode try but error digicode system is active");
+			this.secuManager.getBuzzer().pulse();
+			//TODO Add more info ?
+			return;
+		}
+		
 		//System.out.println("Validating passcode.");
 		
 		boolean goodPasscode = false;
@@ -214,6 +221,10 @@ public class Digicode {
 		if(this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
 			this.secuManager.triggerAlarm("Nombre d'erreur", "Tentative de désactivation de l'alarme hasardeuse !");
 		}
+	}
+	
+	private long timeSinceLastError() {
+		return System.currentTimeMillis() - this.timeLastError;
 	}
 
 	private void setupLinesColumnsState() {

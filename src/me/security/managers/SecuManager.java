@@ -1,5 +1,6 @@
 package me.security.managers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class SecuManager {
 	
 	private final NotificationManager notif;
 	private final DatabaseManager db;
-	private final Thread restApi;
+	private RestAPIManager restApi;
 	private final GpioController GPIO;
 
 	private boolean enabled = false;
@@ -36,7 +37,7 @@ public class SecuManager {
 	
 	private Digicode digicode;
 	
-	public SecuManager(NotificationManager notifications, DatabaseManager db) throws UnsatisfiedLinkError {
+	public SecuManager(NotificationManager notifications, DatabaseManager db) throws UnsatisfiedLinkError, IOException {
 		if(notifications == null) throw new IllegalArgumentException();
 		if(db == null) throw new IllegalArgumentException();
 		this.notif = notifications;
@@ -48,15 +49,8 @@ public class SecuManager {
 		
 		this.db.log("Initialized system correctly.\n" + this.notif.toString());
 		this.notif.triggerIFTTT("System initialized.");
-		
-		this.restApi = new Thread(new Runnable() {
-				
-			@Override
-			public void run() {
-				new RestAPIManager(SecuManager.this);
-			}
-		});
-		this.restApi.start();
+
+		this.restApi = new RestAPIManager(this);
 	}
 	
 	public void initializeHardware() {
@@ -126,6 +120,10 @@ public class SecuManager {
 		return this.buzzer;
 	}
 
+	public boolean hasAlarmTriggered() {
+		return this.alarmTriggered;
+	}
+
 	/**
 	 * Doesn't allow sensor list modification
 	 * @return The list of sensors
@@ -133,9 +131,17 @@ public class SecuManager {
 	public final List<Sensor> getSensors() {
 		return new ArrayList<Sensor>(this.sensors);
 	}
+	
+	public RestAPIManager getRestApi() {
+		return this.restApi;
+	}
 
 	public boolean isEnabled() {
 		return this.enabled;
+	}
+
+	public Digicode getDigicode() {
+		return this.digicode;
 	}
 
 }

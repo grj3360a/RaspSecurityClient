@@ -17,8 +17,10 @@ import com.pi4j.io.gpio.SimulatedGpioProvider;
 
 import me.security.hardware.sensors.Sensor;
 import me.security.hardware.sensors.SensorType;
+import me.security.managers.NotificationManager;
+import me.security.managers.SecuManager;
 import utils.JUnitGPIO;
-import utils.dummy.DummySecuManager;
+import utils.dummy.DummyDatabaseManager;
 
 /*
  * Explications sur les difficultées de cette classe :
@@ -31,7 +33,7 @@ public class SensorTest {
 	
 	private static SimulatedGpioProvider gpio;
 	
-    private DummySecuManager secu;
+    private SecuManager secu;
     private Sensor s1;
     private Sensor s2;
     
@@ -49,9 +51,10 @@ public class SensorTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		this.secu = new DummySecuManager();
+		this.secu = new SecuManager(new NotificationManager(), new DummyDatabaseManager());
+		Sensor.AUTO_INCREMENT = 100;
 		this.s1 = new Sensor(secu, "S1", SensorType.MOTION, RaspiPin.GPIO_01);
-		this.s2 = new Sensor(secu, "S2", SensorType.OPEN, RaspiPin.GPIO_02);
+		this.s2 = new Sensor(secu, "S2", SensorType.OPEN, RaspiPin.GPIO_23);
 	}
 
 	@After
@@ -65,8 +68,8 @@ public class SensorTest {
 
 	@Test
 	public void testGetId() {
-		assertEquals(1, this.s1.getId());
-		assertEquals(2, this.s2.getId());
+		assertEquals(101, this.s1.getId());
+		assertEquals(102, this.s2.getId());
 	}
 
 	@Test
@@ -88,6 +91,7 @@ public class SensorTest {
 
 	@Test
 	public void testTrigger() throws InterruptedException {
+		this.secu.toggleAlarm("JUnit");
 		this.s1.toggle();
 
 		gpio.setState(RaspiPin.GPIO_01, PinState.HIGH);
@@ -95,7 +99,7 @@ public class SensorTest {
 		
 		Thread.sleep(300L);//We have to wait as the SimulatedRaspi is async thread that can't be var synchronized -_-
 
-		assertTrue(secu.alarmTriggered);
+		assertTrue(secu.hasAlarmTriggered());
 	}
 
 }

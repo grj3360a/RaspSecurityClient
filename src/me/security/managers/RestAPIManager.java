@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Scanner;
 
 import com.google.gson.Gson;
@@ -26,28 +28,50 @@ import me.security.managers.DatabaseManager.Log;
  */
 public class RestAPIManager {
 	
-	private static final int PORT = 8080;
+	public static int PORT = 8080; //Edited by JUnit Tests
 	private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 	private static final List<String> AUTHS = Arrays.asList("eaz897hfg654kiu714sf32d1");
 	
 	private final SecuManager security;
+	private ServerSocket server;
+	private boolean enabled;
 
 	/**
 	 * Immediatly start a web server on PORT to answer queries from mobile app
 	 * @param security The main SecuManager
+	 * @throws IOException If serversocket fails to create
 	 */
-	public RestAPIManager(SecuManager security) {
+	public RestAPIManager(SecuManager security) throws IOException {
 		this.security = security;
-		try (ServerSocket server = new ServerSocket(PORT)) {
-			System.out.println("Listening on port " + server.getLocalPort());
-
-			while (true) {
-				ConnectionThread thread = new ConnectionThread(this.security, server.accept());
-				thread.start();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		this.enabled = true;
+		try {
+			this.server = new ServerSocket(PORT);
+		} catch(BindException ex) {
+			System.err.println("Failed to bind on " + PORT + " ! Recovering on an other port..");
+			this.server = new ServerSocket(PORT = 1024 + new Random().nextInt(2000));
 		}
+		System.out.println("Listening on port " + server.getLocalPort());
+
+		new Thread(new Runnable() {
+				
+			@Override
+			public synchronized void run() {
+				while (RestAPIManager.this.enabled) {
+					try {
+						ConnectionThread thread = new ConnectionThread(RestAPIManager.this.security, server.accept());
+						thread.start();
+					} catch(Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+				
+				try {
+					RestAPIManager.this.server.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 	
 	/**
@@ -254,5 +278,9 @@ public class RestAPIManager {
 		}
 
 
+	}
+
+	public void close() {
+		this.enabled = false;
 	}
 }
