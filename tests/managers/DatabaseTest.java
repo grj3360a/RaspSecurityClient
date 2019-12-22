@@ -69,7 +69,6 @@ public class DatabaseTest {
 
 	@Test
 	public void testGetLast10Logs() throws SQLException {
-		long time = System.currentTimeMillis();
 		this.db.log("JUnit Test 1");
 		this.db.log("JUnit Test 2");
 		this.db.log("JUnit Test 3");
