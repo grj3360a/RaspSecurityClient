@@ -70,6 +70,7 @@ public class RestAPITest {
 		assertNotNull(this.restapi);
 		this.restapi.close();
 		this.restapi = null;
+		JUnitGPIO.cleanOut(gpio);
 	}
 	
 	@Test

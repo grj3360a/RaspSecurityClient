@@ -90,7 +90,6 @@ public class DatabaseTest {
 			assertNotNull(l);
 			assertEquals("JUnit Test " + i, l.info);
 			assertFalse(l.relatedToSensor);
-			assertTrue(l.time > time);
 
 			getConnection(this.db).createStatement().execute("DELETE FROM `logs` WHERE `id_log` = " + l.id);
 			i--;
