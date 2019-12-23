@@ -20,25 +20,21 @@ public class SimulatedMode {
         System.out.println("Enabled system in simulated environment.");
         
         //Activating simulation.
-        new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(3000L);//Just Waiting for system to be setup.
-					
-					pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_14);
-					Thread.sleep(570L);
-					pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_10);
-					Thread.sleep(300L);
-					pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_06);
-					Thread.sleep(300L);
-					pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_10);
-					Thread.sleep(300L);
-					pressDigicode(provider, RaspiPin.GPIO_02, RaspiPin.GPIO_05);
-				} catch (Exception e) {//We don't even care
-					e.printStackTrace();
-				}
+        new Thread(() -> {	
+			try {
+				Thread.sleep(3000L);//Just Waiting for system to be setup.
+				
+				pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_14);
+				Thread.sleep(570L);
+				pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_10);
+				Thread.sleep(300L);
+				pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_06);
+				Thread.sleep(300L);
+				pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_10);
+				Thread.sleep(300L);
+				pressDigicode(provider, RaspiPin.GPIO_02, RaspiPin.GPIO_05);
+			} catch (Exception e) {//We don't even care
+				e.printStackTrace();
 			}
 		}).start();
 	}

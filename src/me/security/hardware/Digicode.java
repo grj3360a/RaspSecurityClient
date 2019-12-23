@@ -20,94 +20,101 @@ import me.security.managers.SecuManager;
  * @since 24/11/2019
  */
 public class Digicode {
-	
+
 	private static final int BUFFER_SIZE = 4;
 	private static final int MAXIMUM_NUMBER_OF_TRY = 3;
-	private static final char[][] KEYS = {	{'1', '2', '3', 'A'},
-					 	   					{'4', '5', '6', 'B'},
-					 	   					{'7', '8', '9', 'C'},
-					 	   					{'*', '0', '#', 'D'}};
+	private static final int WAIT_BEFORE_ACTIVATE = 30;
+	private static final char[][] KEYS = { { '1', '2', '3', 'A' }, { '4', '5', '6', 'B' }, { '7', '8', '9', 'C' },
+			{ '*', '0', '#', 'D' } };
 
 	private final SecuManager secuManager;
-	
-	private List<char[]> passcodes;//Valid codes to enable/disable alarm
-	private char[] typedBuffer;//Typed keys buffer
-	private char nTypedBuffer;//Number of key already typed
-	
+
+	private List<char[]> passcodes;// Valid codes to enable/disable alarm
+	private char[] typedBuffer;// Typed keys buffer
+	private char nTypedBuffer;// Number of key already typed
+
 	private long timeLastError;
 	private int numberOfError;
+	private Thread activatingAlarmThread;//Is the digicode currently waiting to activate the alarm
 
 	private final GpioPinDigitalMultipurpose[] padc;
 	private final GpioPinDigitalMultipurpose[] padl;
-	
-	
+
 	public Digicode(SecuManager secuManager, String defaultCode, Pin[] lines, Pin[] columns) {
-		if(secuManager == null) throw new IllegalArgumentException();
-		if(lines == null || lines.length != 4) throw new IllegalArgumentException();
-		if(columns == null || columns.length != 4) throw new IllegalArgumentException();
-		
+		if (secuManager == null)
+			throw new IllegalArgumentException();
+		if (lines == null || lines.length != 4)
+			throw new IllegalArgumentException();
+		if (columns == null || columns.length != 4)
+			throw new IllegalArgumentException();
+
 		this.typedBuffer = new char[BUFFER_SIZE];
 		this.nTypedBuffer = 0;
-		
+
 		this.secuManager = secuManager;
 		this.passcodes = new ArrayList<char[]>();
 		this.addPasscode(defaultCode);
-		
+
 		this.timeLastError = 0;
 		this.numberOfError = 0;
-		
-		this.padc = new GpioPinDigitalMultipurpose[]{provisionPin(columns, 0), provisionPin(columns, 1), provisionPin(columns, 2), provisionPin(columns, 3)};
-		this.padl = new GpioPinDigitalMultipurpose[]{provisionPin(lines, 0),provisionPin(lines, 1), provisionPin(lines, 2), provisionPin(lines, 3)};
-		
+
+		this.padc = new GpioPinDigitalMultipurpose[] { provisionPin(columns, 0), provisionPin(columns, 1),
+				provisionPin(columns, 2), provisionPin(columns, 3) };
+		this.padl = new GpioPinDigitalMultipurpose[] { provisionPin(lines, 0), provisionPin(lines, 1),
+				provisionPin(lines, 2), provisionPin(lines, 3) };
+
 		this.setupLinesColumnsState();
-		
-		for(final GpioPinDigitalInput pc : padc) {
+
+		for (final GpioPinDigitalInput pc : padc) {
 			pc.addListener(new GpioPinListenerDigital() {
-				
+
 				@Override
 				public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-					if(event.getEdge() == PinEdge.FALLING) return;
-					if(!pc.isMode(PinMode.DIGITAL_INPUT)) return;
-					
+					if (event.getEdge() == PinEdge.FALLING)
+						return;
+					if (!pc.isMode(PinMode.DIGITAL_INPUT))
+						return;
+
 					/*
-					 * Reading a column input
-					 * So now we have to reverse inputs/outputs
-					 * Column will now output positive and lines will read
+					 * Reading a column input So now we have to reverse inputs/outputs Column will
+					 * now output positive and lines will read
 					 */
-					
-					for(GpioPinDigitalMultipurpose po : padc) {
+
+					for (GpioPinDigitalMultipurpose po : padc) {
 						po.setMode(PinMode.DIGITAL_OUTPUT);
 						po.setState(true);
 					}
-					for(GpioPinDigitalMultipurpose po : padl) {
+					for (GpioPinDigitalMultipurpose po : padl) {
 						po.setState(false);
 						po.setMode(PinMode.DIGITAL_INPUT);
 					}
-					
+
 					/*
-					 * Any high will now be our reading,
-					 * if multiple input in lines will mean an error.
+					 * Any high will now be our reading, if multiple input in lines will mean an
+					 * error.
 					 */
-					
+
 					int numberOfInput = 0;
-					for(GpioPinDigitalMultipurpose po : padl) {
-						if(po.isHigh()) numberOfInput++;
+					for (GpioPinDigitalMultipurpose po : padl) {
+						if (po.isHigh())
+							numberOfInput++;
 					}
-					
+
 					try {
-						if(numberOfInput > 1) {
-							throw new Exception("Multiple input in lines (" + pc.getPin().getName() + ")... Unable to calculate key from digicode.");
+						if (numberOfInput > 1) {
+							throw new Exception("Multiple input in lines (" + pc.getPin().getName()
+									+ ")... Unable to calculate key from digicode.");
 						}
-						
-						for(GpioPinDigitalMultipurpose po : padl) {
-							if(po.isHigh()) {
+
+						for (GpioPinDigitalMultipurpose po : padl) {
+							if (po.isHigh()) {
 								input(KEYS[Integer.parseInt(po.getName())][Integer.parseInt(pc.getName())]);
 							}
 						}
-					} catch(NumberFormatException ex) {
+					} catch (NumberFormatException ex) {
 						System.err.println("Seems like we having too much columns or errorneous pin names...");
 						ex.printStackTrace();
-					} catch(Exception ex) {
+					} catch (Exception ex) {
 						ex.printStackTrace();
 					} finally {
 						/*
@@ -115,15 +122,15 @@ public class Digicode {
 						 */
 						setupLinesColumnsState();
 					}
-					
+
 				}
 			});
 		}
 	}
-	
+
 	private void input(char c) throws Exception {
-		//System.out.println("Just pressed on digicode : " + c);
-		switch(c) {
+		// System.out.println("Just pressed on digicode : " + c);
+		switch (c) {
 
 		case '0':
 		case '1':
@@ -135,112 +142,132 @@ public class Digicode {
 		case '7':
 		case '8':
 		case '9':
-			if(this.nTypedBuffer >= BUFFER_SIZE) {
-				//FIXME Too much keys pressed.
+			if (this.nTypedBuffer >= BUFFER_SIZE) {
+				// FIXME Too much keys pressed.
 				return;
 			}
-			
+
 			this.typedBuffer[nTypedBuffer] = c;
 			this.nTypedBuffer++;
 			break;
-			
+
 		case '#':// Key to validate
 			this.onValidate();
 			this.cleanBuffer();
 			break;
-			
+
 		case 'A':// Unused key for now (Maybe add new code ?)
 		case 'B':// Unused key for now
 		case 'C':// Unused key for now
 		case 'D':// Unused key for now
 			break;
-		
+
 		case '*':// Key to clear all typed letters
 			this.cleanBuffer();
 			break;
-		
+
 		default:
 			throw new IllegalArgumentException("Unknown key pressed, keyboard layout changed ? ");
-			
+
 		}
 	}
-	
+
 	private GpioPinDigitalMultipurpose provisionPin(Pin[] pins, int i) {
 		return secuManager.getGPIO().provisionDigitalMultipurposePin(pins[i], i + "", PinMode.DIGITAL_OUTPUT);
 	}
-	
+
 	private void cleanBuffer() {
-		//System.out.println("Cleared digicode buffered keys.");
+		// System.out.println("Cleared digicode buffered keys.");
 		this.nTypedBuffer = 0;
 		this.typedBuffer = new char[BUFFER_SIZE];
 	}
-	
+
 	public void addPasscode(String code) {
-		if(code == null || code.length() != 4) throw new IllegalArgumentException("Code is in invalid format (null or lenght different from 4)");
-		if(this.passcodes.contains(code.toUpperCase().toCharArray())) throw new IllegalArgumentException("Code already added.");
+		if (code == null || code.length() != 4)
+			throw new IllegalArgumentException("Code is in invalid format (null or lenght different from 4)");
+		if (this.passcodes.contains(code.toUpperCase().toCharArray()))
+			throw new IllegalArgumentException("Code already added.");
 		this.passcodes.add(code.toUpperCase().toCharArray());
 	}
-	
+
 	/**
-	 * Used when user try to validate buffered keys
-	 * Toggle alarm if passcode is valid
+	 * Used when user try to validate buffered keys Toggle alarm if passcode is
+	 * valid
 	 */
+	@SuppressWarnings("deprecation")//We need to stop some thread and this method is deprecated
 	private void onValidate() {
-		if(this.nTypedBuffer != 4) {
+		if (this.nTypedBuffer != 4) {
 			throw new IllegalStateException("Digicode used a != 4 passcode.");
 		}
-		
-		if(this.numberOfError >= MAXIMUM_NUMBER_OF_TRY && this.timeSinceLastError() < 1000L * 30) {
+
+		if (this.numberOfError >= MAXIMUM_NUMBER_OF_TRY && this.timeSinceLastError() < 1000L * 30) {
 			this.secuManager.getDb().log("Passcode try but error digicode system is active");
 			this.secuManager.getBuzzer().pulse();
-			//TODO Add more info ?
+			// TODO Add more info ?
 			return;
+		} else if (this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
+			this.numberOfError -= 1;
 		}
-		
-		//System.out.println("Validating passcode.");
-		
+
+		// System.out.println("Validating passcode.");
+
 		boolean goodPasscode = false;
-		
-		for(char[] code : this.passcodes) {
-			if(Arrays.equals(code, this.typedBuffer) && !goodPasscode) {
-				this.secuManager.toggleAlarm(new String(code));
+
+		for (char[] code : this.passcodes) {
+			if (Arrays.equals(code, this.typedBuffer) && !goodPasscode) {
+				if(this.activatingAlarmThread.isAlive()) {
+					this.activatingAlarmThread.stop();
+				}
+				
+				//Only on enabling
+				this.activatingAlarmThread = new Thread(() -> {
+					try {
+						if(!secuManager.isEnabled()) {
+							Thread.sleep(WAIT_BEFORE_ACTIVATE);
+						}
+					} catch (InterruptedException e) {}
+					secuManager.toggleAlarm(new String(code));
+				});
+					
+				this.activatingAlarmThread.start();
+				
 				goodPasscode = true;
 				this.timeLastError = 0;
 				this.numberOfError = 0;
 			}
 		}
-		
-		if(!goodPasscode) {
+
+		if (!goodPasscode) {
 			this.timeLastError = System.currentTimeMillis();
 			this.numberOfError++;
 			this.secuManager.getDb().log("Passcode error on Digicode");
 			this.secuManager.getNotif().triggerIFTTT("Erreur de digicode...");
 			this.secuManager.getBuzzer().pulse();
 		}
-		
-		if(this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
+
+		if (!this.secuManager.hasAlarmTriggered() && this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
 			this.secuManager.triggerAlarm("Nombre d'erreur", "Tentative de désactivation de l'alarme hasardeuse !");
 		}
 	}
-	
+
 	private long timeSinceLastError() {
 		return System.currentTimeMillis() - this.timeLastError;
 	}
 
 	private void setupLinesColumnsState() {
-		for(GpioPinDigitalMultipurpose po : padl) {
+		for (GpioPinDigitalMultipurpose po : padl) {
 			po.setDebounce(50);
 			po.setMode(PinMode.DIGITAL_OUTPUT);
 			po.setPullResistance(PinPullResistance.PULL_DOWN);
 			po.setState(true);
 		}
-		
-		for(GpioPinDigitalMultipurpose po : padc) {
+
+		for (GpioPinDigitalMultipurpose po : padc) {
 			po.setDebounce(50);
 			po.setMode(PinMode.DIGITAL_INPUT);
 			po.setPullResistance(PinPullResistance.PULL_DOWN);
 			po.setState(false);
 		}
 	}
-	
+
 }

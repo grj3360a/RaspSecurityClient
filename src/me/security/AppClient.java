@@ -55,10 +55,8 @@ public class AppClient {
 		new SecuManager(notif, db);
 		
 		//Adding closing mechanism to shutdown DB connection
-		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-		    public void run() {
-		    	db.close();
-		    }
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+	    	db.close();
 		}));
 		
 		while(true) { // We need this in main thread to sleep while WiringPi is running in background.

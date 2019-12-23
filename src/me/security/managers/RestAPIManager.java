@@ -52,24 +52,20 @@ public class RestAPIManager {
 		}
 		System.out.println("Listening on port " + server.getLocalPort());
 
-		new Thread(new Runnable() {
-				
-			@Override
-			public synchronized void run() {
-				while (RestAPIManager.this.enabled) {
-					try {
-						ConnectionThread thread = new ConnectionThread(RestAPIManager.this.security, server.accept());
-						thread.start();
-					} catch(Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-				
+		new Thread(() -> {
+			while (RestAPIManager.this.enabled) {
 				try {
-					RestAPIManager.this.server.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+					ConnectionThread thread = new ConnectionThread(RestAPIManager.this.security, server.accept());
+					thread.start();
+				} catch(Exception ex) {
+					ex.printStackTrace();
 				}
+			}
+				
+			try {
+				RestAPIManager.this.server.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}).start();
 	}
