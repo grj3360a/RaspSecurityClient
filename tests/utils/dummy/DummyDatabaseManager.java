@@ -13,7 +13,7 @@ import me.security.managers.DatabaseManager;
 public class DummyDatabaseManager extends DatabaseManager {
 
 	public DummyDatabaseManager() throws SQLException {
-		super(null, null, null, null);
+		super("notnull", "notnull", "notnull", "notnull");
 	}
 
 	@Override
