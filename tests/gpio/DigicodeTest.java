@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.SimulatedGpioProvider;
 
@@ -50,7 +51,7 @@ public class DigicodeTest {
 		this.digi = null;
 		this.secu = null;
 	}
-
+	
 	@Test
 	public void testToggleOnAlarm() {
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
@@ -60,7 +61,7 @@ public class DigicodeTest {
 		
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 		
-		assertTrue(secu.isEnabled());
+		assertTrue(secu.getDigicode().isActivating());
 	}
 
 	@Test
@@ -77,8 +78,8 @@ public class DigicodeTest {
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
 		
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
-		
-		assertTrue(secu.isEnabled());
+
+		assertTrue(secu.getDigicode().isActivating());
 	}
 
 	@Test
@@ -90,8 +91,8 @@ public class DigicodeTest {
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
 		
 		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
-		
-		assertTrue(secu.isEnabled());
+
+		assertTrue(secu.getDigicode().isActivating());
 	}
 
 	@Test
@@ -110,5 +111,62 @@ public class DigicodeTest {
 		
 		assertFalse(secu.isEnabled());
 	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testNullSecuManager() throws Exception {
+		JUnitGPIO.cleanOut(gpio);
+		new Digicode(null, "1234", 
+				new Pin[] {RaspiPin.GPIO_14, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05}, 
+				new Pin[] {RaspiPin.GPIO_04, RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_00});
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testNullCode() throws Exception {
+		JUnitGPIO.cleanOut(gpio);
+		new Digicode(new SecuManager(new NotificationManager(), new DummyDatabaseManager()), null, 
+				new Pin[] {RaspiPin.GPIO_14, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05}, 
+				new Pin[] {RaspiPin.GPIO_04, RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_00});
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testCodeInvalid() throws Exception {
+		JUnitGPIO.cleanOut(gpio);
+		new Digicode(new SecuManager(new NotificationManager(), new DummyDatabaseManager()), "TAILLE_INVALIDE", 
+				new Pin[] {RaspiPin.GPIO_14, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05}, 
+				new Pin[] {RaspiPin.GPIO_04, RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_00});
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testLinesNull() throws Exception {
+		JUnitGPIO.cleanOut(gpio);
+		new Digicode(new SecuManager(new NotificationManager(), new DummyDatabaseManager()), "1234", 
+				null, 
+				new Pin[] {RaspiPin.GPIO_04, RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_00});
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testLinesInvalid() throws Exception {
+		JUnitGPIO.cleanOut(gpio);
+		new Digicode(new SecuManager(new NotificationManager(), new DummyDatabaseManager()), "1234", 
+				new Pin[] {RaspiPin.GPIO_14}, 
+				new Pin[] {RaspiPin.GPIO_04, RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_00});
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testColumnsNull() throws Exception {
+		JUnitGPIO.cleanOut(gpio);
+		new Digicode(new SecuManager(new NotificationManager(), new DummyDatabaseManager()), "1234", 
+				new Pin[] {RaspiPin.GPIO_14, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05}, 
+				null);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testColumnsInvalid() throws Exception {
+		JUnitGPIO.cleanOut(gpio);
+		new Digicode(new SecuManager(new NotificationManager(), new DummyDatabaseManager()), "1234", 
+				new Pin[] {RaspiPin.GPIO_14, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05}, 
+				new Pin[] {RaspiPin.GPIO_02,RaspiPin.GPIO_00});
+	}
+	
 
 }

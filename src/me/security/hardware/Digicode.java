@@ -16,6 +16,7 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import me.security.managers.SecuManager;
 
 /**
+ * This class manage a single Digicode
  * @author Geraldes Jocelyn
  * @since 24/11/2019
  */
@@ -23,9 +24,12 @@ public class Digicode {
 
 	private static final int BUFFER_SIZE = 4;
 	private static final int MAXIMUM_NUMBER_OF_TRY = 3;
-	private static final int WAIT_BEFORE_ACTIVATE = 30;
-	private static final char[][] KEYS = { { '1', '2', '3', 'A' }, { '4', '5', '6', 'B' }, { '7', '8', '9', 'C' },
-			{ '*', '0', '#', 'D' } };
+	private static final int WAIT_BEFORE_ACTIVATE = 30 * 1000;
+	private static final char[][] KEYS = { 
+			{ '1', '2', '3', 'A' }, 
+			{ '4', '5', '6', 'B' }, 
+			{ '7', '8', '9', 'C' },
+			{ '*', '0', '#', 'D' } 		 };
 
 	private final SecuManager secuManager;
 
@@ -40,13 +44,33 @@ public class Digicode {
 	private final GpioPinDigitalMultipurpose[] padc;
 	private final GpioPinDigitalMultipurpose[] padl;
 
-	public Digicode(SecuManager secuManager, String defaultCode, Pin[] lines, Pin[] columns) {
+	/**
+	 * Build a digicode from pins and a default code
+	 * @param secuManager
+	 * @param defaultCode
+	 * @param lines
+	 * @param columns
+	 * @throws IllegalArgumentException SecuManager must not be null
+	 * @throws IllegalArgumentException There must be 4 lines pins defined
+	 * @throws IllegalArgumentException There must be 4 columns pins defined
+	 * @throws IllegalArgumentException defaultCode must not be null
+	 * @throws IllegalArgumentException defaultCode must not be 4 characters
+	 */
+	public Digicode(SecuManager secuManager, String defaultCode, Pin[] lines, Pin[] columns) throws IllegalArgumentException {
 		if (secuManager == null)
-			throw new IllegalArgumentException();
-		if (lines == null || lines.length != 4)
-			throw new IllegalArgumentException();
-		if (columns == null || columns.length != 4)
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("SecuManager can't be null");
+		if (lines == null)
+			throw new IllegalArgumentException("Lines can't be null");
+		if (lines.length != 4)
+			throw new IllegalArgumentException("There must be 4 lines of pins");
+		if (columns == null)
+			throw new IllegalArgumentException("Columns can't be null");
+		if (columns.length != 4)
+			throw new IllegalArgumentException("There must be 4 columns of pins");
+		if (defaultCode == null)
+			throw new IllegalArgumentException("defaultCode can't be null");
+		if (defaultCode.length() != 4)
+			throw new IllegalArgumentException("defaultCode must be 4 characters");
 
 		this.typedBuffer = new char[BUFFER_SIZE];
 		this.nTypedBuffer = 0;
@@ -172,12 +196,20 @@ public class Digicode {
 		}
 	}
 
+	/**
+	 * Provision pin with the Digicode naming scheme
+	 * @param pins Columns or lines pins
+	 * @param i Pin number in array
+	 * @return The multipurpose digital pin
+	 */
 	private GpioPinDigitalMultipurpose provisionPin(Pin[] pins, int i) {
 		return secuManager.getGPIO().provisionDigitalMultipurposePin(pins[i], i + "", PinMode.DIGITAL_OUTPUT);
 	}
 
+	/**
+	 * Clear already typed keys on the Digicode
+	 */
 	private void cleanBuffer() {
-		// System.out.println("Cleared digicode buffered keys.");
 		this.nTypedBuffer = 0;
 		this.typedBuffer = new char[BUFFER_SIZE];
 	}
@@ -215,7 +247,7 @@ public class Digicode {
 
 		for (char[] code : this.passcodes) {
 			if (Arrays.equals(code, this.typedBuffer) && !goodPasscode) {
-				if(this.activatingAlarmThread.isAlive()) {
+				if(this.activatingAlarmThread != null && this.activatingAlarmThread.isAlive()) {
 					this.activatingAlarmThread.stop();
 				}
 				
@@ -250,10 +282,19 @@ public class Digicode {
 		}
 	}
 
+	/**
+	 * @return Milliseconds since our last error
+	 */
 	private long timeSinceLastError() {
 		return System.currentTimeMillis() - this.timeLastError;
 	}
 
+	/**
+	 * Setup lines and columns to initial state<br>
+	 * Lines will be high<br>
+	 * Columns will be down state<br>
+	 * When any column enter high state, this will dispatch a listened event
+	 */
 	private void setupLinesColumnsState() {
 		for (GpioPinDigitalMultipurpose po : padl) {
 			po.setDebounce(50);
@@ -268,6 +309,10 @@ public class Digicode {
 			po.setPullResistance(PinPullResistance.PULL_DOWN);
 			po.setState(false);
 		}
+	}
+	
+	public boolean isActivating() {
+		return this.activatingAlarmThread != null && this.activatingAlarmThread.isAlive();
 	}
 
 }

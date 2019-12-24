@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Scanner;
 
 import com.google.gson.Gson;
@@ -20,6 +19,7 @@ import com.google.gson.GsonBuilder;
 
 import me.security.hardware.sensors.Sensor;
 import me.security.managers.DatabaseManager.Log;
+import utils.JUnitUtil;
 
 /**
  * @author Geraldes Jocelyn
@@ -27,8 +27,9 @@ import me.security.managers.DatabaseManager.Log;
  * Manage a web server to answer requests from mobile app
  */
 public class RestAPIManager {
-	
+
 	public static int PORT = 8080; //Edited by JUnit Tests
+	
 	private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 	private static final List<String> AUTHS = Arrays.asList("eaz897hfg654kiu714sf32d1");
 	
@@ -41,15 +42,15 @@ public class RestAPIManager {
 	 * @param security The main SecuManager
 	 * @throws IOException If serversocket fails to create
 	 */
-	public RestAPIManager(SecuManager security) throws IOException {
+	public RestAPIManager(SecuManager security) throws IOException, BindException {
 		this.security = security;
 		this.enabled = true;
-		try {
-			this.server = new ServerSocket(PORT);
-		} catch(BindException ex) {
-			System.err.println("Failed to bind on " + PORT + " ! Recovering on an other port..");
-			this.server = new ServerSocket(PORT = 1024 + new Random().nextInt(2000));
-		}
+		
+		if(JUnitUtil.isJUnitTest())
+			PORT = 0;
+		
+		this.server = new ServerSocket(PORT);
+		PORT = this.server.getLocalPort();
 		System.out.println("Listening on port " + server.getLocalPort());
 
 		new Thread(() -> {

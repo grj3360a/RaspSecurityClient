@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStreamReader;
-import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -44,10 +43,6 @@ public class RestAPITest {
     	gpio = null;
     }
     
-    public static String baseUrl() {
-    	return "http://127.0.0.1:" + RestAPIManager.PORT + "/";
-    }
-    
     //
 
 	private HttpClient httpClient;
@@ -56,8 +51,6 @@ public class RestAPITest {
 	
 	@Before
 	public void setUp() throws Exception {
-		//Change port of RestAPI WebServer to fix the 'multiple service bind on one port' error
-		RestAPIManager.PORT = 1024 + new Random().nextInt(2000);
 		//Get the RestAPI from a dummy SecurityManager
 		this.secu = new SecuManager(new NotificationManager(), new DummyDatabaseManager());
 		this.restapi = this.secu.getRestApi();
@@ -75,14 +68,14 @@ public class RestAPITest {
 	
 	@Test
 	public void testNoAuth() throws Exception {
-		HttpGet request = new HttpGet(baseUrl() + "alarm");
+		HttpGet request = new HttpGet("http://127.0.0.1:" + RestAPIManager.PORT + "/alarm");
 		HttpResponse hr = this.httpClient.execute(request);
 		assertEquals(401, hr.getStatusLine().getStatusCode());
 	}
 	
 	@Test
 	public void testInvalidAuth() throws Exception {
-		HttpGet request = new HttpGet(baseUrl() + "alarm");
+		HttpGet request = new HttpGet("http://127.0.0.1:" + RestAPIManager.PORT + "/alarm");
 		request.addHeader("appPassword", "INVALID_PASSWORD");
 		HttpResponse hr = this.httpClient.execute(request);
 		assertEquals(401, hr.getStatusLine().getStatusCode());
@@ -90,7 +83,7 @@ public class RestAPITest {
 
 	@Test
 	public void testAlarmState() throws Exception {
-		HttpGet request = new HttpGet(baseUrl() + "alarm");
+		HttpGet request = new HttpGet("http://127.0.0.1:" + RestAPIManager.PORT + "/alarm");
 		request.addHeader("appPassword", jUnitAppPassword);
 		HttpResponse hr = this.httpClient.execute(request);
 		assertEquals(200, hr.getStatusLine().getStatusCode());
@@ -99,7 +92,8 @@ public class RestAPITest {
 
 	@Test
 	public void testAlarmToggle() throws Exception {
-		HttpGet request = new HttpGet(baseUrl() + "alarm/toggle");
+		System.out.println("http://127.0.0.1:" + RestAPIManager.PORT + "/alarm/toggle");
+		HttpGet request = new HttpGet("http://127.0.0.1:" + RestAPIManager.PORT + "/alarm/toggle");
 		request.addHeader("appPassword", jUnitAppPassword);
 		
 		//Toggle ON
