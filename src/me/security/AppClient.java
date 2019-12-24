@@ -8,15 +8,13 @@ import me.security.managers.NotificationManager;
 import me.security.managers.SecuManager;
 import me.security.notification.NotificationFreeAPI;
 import me.security.notification.NotificationIFTTT;
-import me.security.windows.SimulatedMode;
+import me.security.simulation.SimulatedMode;
 
 /**
  * @author Geraldes Jocelyn
  * @since 24/11/2019
  */
 public class AppClient {
-	
-	public static boolean SIMULATED_MODE = false;
 
 	public static void main(String[] args) throws IOException, SQLException {
 		for(String s : args) {
