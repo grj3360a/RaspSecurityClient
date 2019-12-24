@@ -23,7 +23,7 @@ public class NotificationManager {
 	/**
 	 * Add the specified NotificationSender to senders list
 	 * This will permit this NotificationManager to trigger ns with triggerAll for example
-	 * @param ns {@link NotificationSender}
+	 * @param ns {@link NotificationSender} The notification sensor to add to the list of senders
 	 * @throws IllegalArgumentException ns must not be null and not already contained in the senders list
 	 */
 	public void add(NotificationSender ns) throws IllegalArgumentException {

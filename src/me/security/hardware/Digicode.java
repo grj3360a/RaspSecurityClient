@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalMultipurpose;
 import com.pi4j.io.gpio.Pin;
@@ -203,7 +204,7 @@ public class Digicode {
 	 * @return The multipurpose digital pin
 	 */
 	private GpioPinDigitalMultipurpose provisionPin(Pin[] pins, int i) {
-		return secuManager.getGPIO().provisionDigitalMultipurposePin(pins[i], i + "", PinMode.DIGITAL_OUTPUT);
+		return GpioFactory.getInstance().provisionDigitalMultipurposePin(pins[i], i + "", PinMode.DIGITAL_OUTPUT);
 	}
 
 	/**

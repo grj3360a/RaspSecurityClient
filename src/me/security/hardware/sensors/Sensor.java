@@ -1,6 +1,7 @@
 package me.security.hardware.sensors;
 
 import com.google.gson.annotations.Expose;
+import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinEdge;
@@ -39,7 +40,7 @@ public class Sensor {
 		if(type == null) throw new IllegalArgumentException();
 		this.manager = manager;
 		this.name = name;
-		this.pin = manager.getGPIO().provisionDigitalInputPin(pin);
+		this.pin = GpioFactory.getInstance().provisionDigitalInputPin(pin);
 		this.type = type;
 		
 		this.pin.addListener(new GpioPinListenerDigital() {

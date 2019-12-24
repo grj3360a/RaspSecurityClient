@@ -16,6 +16,10 @@ import me.security.simulation.SimulatedMode;
  */
 public class AppClient {
 
+	/**
+	 * The main entry point of RaspSecurity.
+	 * Utilization of the argument --simulated is needed if running this on Windows
+	 */
 	public static void main(String[] args) throws IOException, SQLException {
 		for(String s : args) {
 			if(s.toLowerCase().equals("--simulated")) {
@@ -23,14 +27,7 @@ public class AppClient {
 			}
 		}
 		
-		/*
-		 * Database
-		 */
 		DatabaseManager db = DatabaseManager.generateFromFile();
-		
-		/*
-		 * Notification
-		 */
 		NotificationManager notif = new NotificationManager();
 		
 		try {
@@ -57,10 +54,5 @@ public class AppClient {
 	    	db.close();
 		}));
 		
-		while(true) { // We need this in main thread to sleep while WiringPi is running in background.
-			try {
-				Thread.sleep(1000L);
-			} catch (InterruptedException e) {}
-		}
 	}
 }

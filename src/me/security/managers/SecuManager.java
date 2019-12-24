@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 
@@ -23,7 +21,6 @@ public class SecuManager {
 	private final NotificationManager notif;
 	private final DatabaseManager db;
 	private RestAPIManager restApi;
-	private final GpioController GPIO;
 
 	private boolean enabled = false;
 	private boolean alarmTriggered = false;
@@ -37,30 +34,28 @@ public class SecuManager {
 	
 	private Digicode digicode;
 	
+	/**
+	 * Create an instance of a Security Manager<br>
+	 * This will initialize all the hardware needed and log an initialization message<br>
+	 * This will also run a RestAPIManager instance
+	 * @param notifications
+	 * @param db
+	 * @throws UnsatisfiedLinkError
+	 * @throws IOException
+	 */
 	public SecuManager(NotificationManager notifications, DatabaseManager db) throws UnsatisfiedLinkError, IOException {
-		if(notifications == null) throw new IllegalArgumentException();
-		if(db == null) throw new IllegalArgumentException();
+		if(notifications == null) throw new IllegalArgumentException("NotificationManager cannot be null");
+		if(db == null) throw new IllegalArgumentException("DatabaseManager cannot be null");
 		this.notif = notifications;
 		this.db = db;
 
-		this.GPIO = GpioFactory.getInstance();
-		initializeHardware();
-
-		
-		this.db.log("Initialized system correctly.\n" + this.notif.toString());
-		this.notif.triggerIFTTT("System initialized.");
-
-		this.restApi = new RestAPIManager(this);
-	}
-	
-	public void initializeHardware() {
-		this.blueLed = new DisplayElement(this, RaspiPin.GPIO_25);
+		this.blueLed = new DisplayElement(RaspiPin.GPIO_25);
 		this.blueLed.blinkIndefinitly();
-		this.redLed = new DisplayElement(this, RaspiPin.GPIO_22);
+		this.redLed = new DisplayElement(RaspiPin.GPIO_22);
 		this.redLed.off();
 
-		this.alarm = new DisplayElement(this, RaspiPin.GPIO_27);
-		this.buzzer = new DisplayElement(this, RaspiPin.GPIO_26);
+		this.alarm = new DisplayElement(RaspiPin.GPIO_27);
+		this.buzzer = new DisplayElement(RaspiPin.GPIO_26);
 		
 		this.digicode = new Digicode
 				(this,
@@ -74,6 +69,11 @@ public class SecuManager {
 		this.sensors.add(new Sensor(this, "Fenêtre arrière", SensorType.OPEN, RaspiPin.GPIO_31));
 		this.sensors.add(new Sensor(this, "Chaleur salon", SensorType.HEAT, RaspiPin.GPIO_28));
 		this.sensors.add(new Sensor(this, "Gaz salon", SensorType.GAS, RaspiPin.GPIO_24));
+		
+		this.db.log("Initialized system correctly.\n" + this.notif.toString());
+		this.notif.triggerIFTTT("System initialized.");
+
+		this.restApi = new RestAPIManager(this);
 	}
 	
 	public void triggerAlarm(String sensorName, String alertMessage) {
@@ -101,27 +101,7 @@ public class SecuManager {
 		this.enabled = !enabled;
 		this.db.log("Alarm toggled " + (enabled ? "ON" : "OFF") + " with code : " + code);
 		this.notif.triggerIFTTT("Alarme " + (enabled ? "activée" : "désactivée") + " avec le code " + code);
-		this.buzzer.flashingBuzz();
-	}
-	
-	public GpioController getGPIO() {
-		return this.GPIO;
-	}
-
-	public NotificationManager getNotif() {
-		return this.notif;
-	}
-
-	public DatabaseManager getDb() {
-		return this.db;
-	}
-
-	public DisplayElement getBuzzer() {
-		return this.buzzer;
-	}
-
-	public boolean hasAlarmTriggered() {
-		return this.alarmTriggered;
+		this.buzzer.flashing();
 	}
 
 	/**
@@ -131,17 +111,33 @@ public class SecuManager {
 	public final List<Sensor> getSensors() {
 		return new ArrayList<Sensor>(this.sensors);
 	}
-	
-	public RestAPIManager getRestApi() {
-		return this.restApi;
-	}
 
-	public boolean isEnabled() {
-		return this.enabled;
+	public DisplayElement getBuzzer() {
+		return this.buzzer;
 	}
 
 	public Digicode getDigicode() {
 		return this.digicode;
+	}
+	
+	public RestAPIManager getRestApi() {
+		return this.restApi;
+	}
+	
+	public NotificationManager getNotif() {
+		return this.notif;
+	}
+
+	public DatabaseManager getDb() {
+		return this.db;
+	}
+
+	public boolean hasAlarmTriggered() {
+		return this.alarmTriggered;
+	}
+
+	public boolean isEnabled() {
+		return this.enabled;
 	}
 
 }
