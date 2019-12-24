@@ -28,13 +28,13 @@ import utils.JUnitUtil;
  */
 public class RestAPIManager {
 
-	public static int PORT = 8080; //Edited by JUnit Tests
+	public static int PORT = 8080;
 	
 	private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 	private static final List<String> AUTHS = Arrays.asList("eaz897hfg654kiu714sf32d1");
 	
 	private final SecuManager security;
-	private ServerSocket server;
+	private final ServerSocket server;
 	private boolean enabled;
 
 	/**
@@ -74,7 +74,7 @@ public class RestAPIManager {
 	/**
 	 * Manage a specific connection from a single socket
 	 */
-	static class ConnectionThread extends Thread {
+	private class ConnectionThread extends Thread {
 		
 		private final SecuManager security;
 		private Socket client;
