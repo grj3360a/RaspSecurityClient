@@ -18,6 +18,7 @@ public class NotificationManager {
 	
 	public NotificationManager() {
 		this.senders = new ArrayList<NotificationSender>();
+		System.out.println("NotificationManager created successfuly.");
 	}
 
 	/**
@@ -30,6 +31,7 @@ public class NotificationManager {
 		if(ns == null) throw new IllegalArgumentException("Null NotificationSender");
 		if(this.senders.contains(ns)) throw new IllegalArgumentException("NotificationSender is already in senders list");
 		this.senders.add(ns);
+		System.out.println("Adding " + ns.getClass().getName() + " to NotificationSender list");
 	}
 	
 	/**

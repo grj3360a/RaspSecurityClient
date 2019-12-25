@@ -127,8 +127,9 @@ public class Digicode {
 
 					try {
 						if (numberOfInput > 1) {
-							throw new Exception("Multiple input in lines (" + pc.getPin().getName()
+							System.err.println("Multiple input in lines (" + pc.getPin().getName()
 									+ ")... Unable to calculate key from digicode.");
+							return;
 						}
 
 						for (GpioPinDigitalMultipurpose po : padl) {
@@ -154,7 +155,8 @@ public class Digicode {
 	}
 
 	private void input(char c) throws Exception {
-		// System.out.println("Just pressed on digicode : " + c);
+		System.out.println("Digicode : " + c);
+		this.secuManager.getBuzzer().shortNote();
 		switch (c) {
 
 		case '0':
@@ -168,7 +170,9 @@ public class Digicode {
 		case '8':
 		case '9':
 			if (this.nTypedBuffer >= BUFFER_SIZE) {
-				// FIXME Too much keys pressed.
+				this.cleanBuffer();
+				this.secuManager.getYellowLed().pulse();
+				this.secuManager.getBuzzer().multipleLow(2);
 				return;
 			}
 
@@ -230,19 +234,21 @@ public class Digicode {
 	@SuppressWarnings("deprecation")//We need to stop some thread and this method is deprecated
 	private void onValidate() {
 		if (this.nTypedBuffer != 4) {
-			throw new IllegalStateException("Digicode used a != 4 passcode.");
+			System.out.println("Digicode used a != 4 passcode.");
+			this.secuManager.getBuzzer().multipleHigh(2);
+			this.secuManager.getYellowLed().pulse();
+			return;
 		}
 
 		if (this.numberOfError >= MAXIMUM_NUMBER_OF_TRY && this.timeSinceLastError() < 1000L * 30) {
-			this.secuManager.getDb().log("Passcode try but error digicode system is active");
-			this.secuManager.getBuzzer().pulse();
+			this.secuManager.getDb().log("Passcode try but too many errors");
+			this.secuManager.getBuzzer().multipleHigh(5);
+			this.secuManager.getYellowLed().flashing();
 			// TODO Add more info ?
 			return;
 		} else if (this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
 			this.numberOfError -= 1;
 		}
-
-		// System.out.println("Validating passcode.");
 
 		boolean goodPasscode = false;
 
@@ -275,7 +281,7 @@ public class Digicode {
 			this.numberOfError++;
 			this.secuManager.getDb().log("Passcode error on Digicode");
 			this.secuManager.getNotif().triggerIFTTT("Erreur de digicode...");
-			this.secuManager.getBuzzer().pulse();
+			this.secuManager.getBuzzer().buzzLowNote();
 		}
 
 		if (!this.secuManager.hasAlarmTriggered() && this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
@@ -308,7 +314,6 @@ public class Digicode {
 			po.setDebounce(50);
 			po.setMode(PinMode.DIGITAL_INPUT);
 			po.setPullResistance(PinPullResistance.PULL_DOWN);
-			po.setState(false);
 		}
 	}
 	

@@ -39,6 +39,7 @@ public class DatabaseManager implements AutoCloseable {
 	 */
 	public static DatabaseManager generateFromFile() throws IOException, SQLException, IllegalStateException {
 		File dbPassword = new File("database.password");
+		System.out.println("Parsing " + dbPassword.getCanonicalPath() + " file");
 		
 		if(!dbPassword.exists() || !dbPassword.canRead()) {
 			throw new IllegalStateException("Database password file doesn't exist, unable to launch.");
@@ -49,6 +50,7 @@ public class DatabaseManager implements AutoCloseable {
 		}
 		
 		List<String> dbInfo = Files.readAllLines(dbPassword.toPath());
+		System.out.println("Database file readed successfuly, creating DatabaseManager");
 		return new DatabaseManager(dbInfo.get(0), dbInfo.get(1), dbInfo.get(2), dbInfo.get(3));
 	}
 	
@@ -89,6 +91,7 @@ public class DatabaseManager implements AutoCloseable {
 	 * @throws SQLException If the connection can't be initiated
 	 */
 	protected void initializeConnection(String domain, String db, String user, String password) throws SQLException {
+		System.out.println("Establishing database connection (" + domain + ")...");
 		DriverManager.setLoginTimeout(1);
 		this.connection = DriverManager.getConnection("jdbc:mysql://" + domain + ":3306/" + db, user, password);
 	}

@@ -19,7 +19,7 @@ public class DisplayElement {
 	 * @param pin The pin linked to that element
 	 */
 	public DisplayElement(Pin pin) {
-		this.pin = GpioFactory.getInstance().provisionDigitalOutputPin(pin);
+		this.pin = GpioFactory.getInstance().provisionDigitalOutputPin(pin, "Display Element");
 		this.pin.setState(false);
 	}
 	

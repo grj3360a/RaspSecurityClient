@@ -40,7 +40,7 @@ public class Sensor {
 		if(type == null) throw new IllegalArgumentException();
 		this.manager = manager;
 		this.name = name;
-		this.pin = GpioFactory.getInstance().provisionDigitalInputPin(pin);
+		this.pin = GpioFactory.getInstance().provisionDigitalInputPin(pin, "Sensor " + type + " " + name);
 		this.type = type;
 		
 		this.pin.addListener(new GpioPinListenerDigital() {

@@ -24,6 +24,7 @@ public class NotificationFreeAPI extends NotificationSender {
 	
 	public static NotificationFreeAPI generateFromFile() throws IOException {
 		File freePwd = new File("free.password");
+		System.out.println("Parsing " + freePwd.getCanonicalPath() + " file");
 
 		if(!freePwd.exists() || !freePwd.canRead())
 			throw new FileNotFoundException("Free password file doesn't exist or cannot be readed");

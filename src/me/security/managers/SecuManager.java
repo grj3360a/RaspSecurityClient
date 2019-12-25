@@ -7,6 +7,7 @@ import java.util.List;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 
+import me.security.hardware.Buzzer;
 import me.security.hardware.Digicode;
 import me.security.hardware.DisplayElement;
 import me.security.hardware.sensors.Sensor;
@@ -28,9 +29,11 @@ public class SecuManager {
 	private List<Sensor> sensors;
 	private DisplayElement blueLed;
 	private DisplayElement redLed;
+	private DisplayElement yellowLed;
+	private DisplayElement greenLed;
 
 	private DisplayElement alarm;
-	private DisplayElement buzzer;
+	private Buzzer buzzer;
 	
 	private Digicode digicode;
 	
@@ -51,24 +54,28 @@ public class SecuManager {
 
 		this.blueLed = new DisplayElement(RaspiPin.GPIO_25);
 		this.blueLed.blinkIndefinitly();
-		this.redLed = new DisplayElement(RaspiPin.GPIO_22);
+		this.redLed = new DisplayElement(RaspiPin.GPIO_24);
 		this.redLed.off();
+		this.yellowLed = new DisplayElement(RaspiPin.GPIO_27);
+		this.yellowLed.off();
+		this.greenLed = new DisplayElement(RaspiPin.GPIO_28);
+		this.greenLed.off();
 
-		this.alarm = new DisplayElement(RaspiPin.GPIO_27);
-		this.buzzer = new DisplayElement(RaspiPin.GPIO_26);
+		this.alarm = new DisplayElement(RaspiPin.GPIO_16);
+		this.buzzer = new Buzzer(RaspiPin.GPIO_15);
 		
 		this.digicode = new Digicode
 				(this,
 				"1574", 
-				new Pin[]{RaspiPin.GPIO_14, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05}, 
-				new Pin[]{RaspiPin.GPIO_04, RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_00});
+				new Pin[]{RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22, RaspiPin.GPIO_21},
+				new Pin[]{RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01, RaspiPin.GPIO_00});
 		
 		this.sensors = new ArrayList<Sensor>();
-		this.sensors.add(new Sensor(this, "Mouvement salon", SensorType.MOTION, RaspiPin.GPIO_29));
-		this.sensors.add(new Sensor(this, "Fenêtre avant", SensorType.OPEN, RaspiPin.GPIO_30));
-		this.sensors.add(new Sensor(this, "Fenêtre arrière", SensorType.OPEN, RaspiPin.GPIO_31));
-		this.sensors.add(new Sensor(this, "Chaleur salon", SensorType.HEAT, RaspiPin.GPIO_28));
-		this.sensors.add(new Sensor(this, "Gaz salon", SensorType.GAS, RaspiPin.GPIO_24));
+		this.sensors.add(new Sensor(this, "Mouvement salon", SensorType.MOTION, RaspiPin.GPIO_04));
+		this.sensors.add(new Sensor(this, "Fenêtre avant", SensorType.OPEN, RaspiPin.GPIO_07));
+		//this.sensors.add(new Sensor(this, "Fenêtre arrière", SensorType.OPEN, RaspiPin.GPIO_31));
+		//this.sensors.add(new Sensor(this, "Chaleur salon", SensorType.HEAT, RaspiPin.GPIO_28));
+		//this.sensors.add(new Sensor(this, "Gaz salon", SensorType.GAS, RaspiPin.GPIO_24));
 		
 		this.db.log("Initialized system correctly.\n" + this.notif.toString());
 		this.notif.triggerIFTTT("System initialized.");
@@ -101,7 +108,7 @@ public class SecuManager {
 		this.enabled = !enabled;
 		this.db.log("Alarm toggled " + (enabled ? "ON" : "OFF") + " with code : " + code);
 		this.notif.triggerIFTTT("Alarme " + (enabled ? "activée" : "désactivée") + " avec le code " + code);
-		this.buzzer.flashing();
+		this.buzzer.buzzHighNote();
 	}
 
 	/**
@@ -112,8 +119,24 @@ public class SecuManager {
 		return new ArrayList<Sensor>(this.sensors);
 	}
 
-	public DisplayElement getBuzzer() {
+	public Buzzer getBuzzer() {
 		return this.buzzer;
+	}
+
+	public DisplayElement getBlueLed() {
+		return blueLed;
+	}
+
+	public DisplayElement getRedLed() {
+		return redLed;
+	}
+
+	public DisplayElement getYellowLed() {
+		return yellowLed;
+	}
+
+	public DisplayElement getGreenLed() {
+		return greenLed;
 	}
 
 	public Digicode getDigicode() {

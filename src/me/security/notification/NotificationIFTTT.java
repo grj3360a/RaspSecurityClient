@@ -23,6 +23,7 @@ public class NotificationIFTTT extends NotificationSender {
 	
 	public static NotificationIFTTT generateFromFile() throws IOException {
 		File iftttPwd = new File("ifttt.password");
+		System.out.println("Parsing " + iftttPwd.getCanonicalPath() + " file");
 
 		if(!iftttPwd.exists() || !iftttPwd.canRead())
 			throw new FileNotFoundException("IFTTT password file doesn't exist or can't be readed");

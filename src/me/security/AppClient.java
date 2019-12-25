@@ -21,12 +21,13 @@ public class AppClient {
 	 * Utilization of the argument --simulated is needed if running this on Windows
 	 */
 	public static void main(String[] args) throws IOException, SQLException {
+		System.out.println("Launching RaspSecurityTest...");
 		for(String s : args) {
 			if(s.toLowerCase().equals("--simulated")) {
 				SimulatedMode.setup();
 			}
 		}
-		
+
 		DatabaseManager db = DatabaseManager.generateFromFile();
 		NotificationManager notif = new NotificationManager();
 		
@@ -51,8 +52,10 @@ public class AppClient {
 		
 		//Adding closing mechanism to shutdown DB connection
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			System.out.println("Closing RaspSecurityTest...");
 	    	db.close();
 		}));
-		
+
+		System.out.println("Started successfuly.");
 	}
 }

@@ -29,15 +29,26 @@ public class SimulatedMode {
 			try {
 				Thread.sleep(3000L);//Just Waiting for system to be setup.
 				
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_14);
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_26);
 				Thread.sleep(570L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_10);
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_23);
 				Thread.sleep(300L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_06);
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_02, RaspiPin.GPIO_23);
 				Thread.sleep(300L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_04, RaspiPin.GPIO_10);
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_22);
 				Thread.sleep(300L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_02, RaspiPin.GPIO_05);
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_21);
+				Thread.sleep(3000L);//Just Waiting for system to be setup.
+				
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_26);
+				Thread.sleep(570L);
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_23);
+				Thread.sleep(300L);
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_02, RaspiPin.GPIO_23);
+				Thread.sleep(300L);
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_22);
+				Thread.sleep(300L);
+				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_21);
 			} catch (Exception e) {//We don't even care
 				e.printStackTrace();
 			}
