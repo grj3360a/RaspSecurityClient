@@ -13,6 +13,8 @@ public class Buzzer {
 
 	public Buzzer(Pin pin) throws IllegalStateException {
 		this.pin = pin.getAddress();
+		if(SimulatedMode.IS_SIMULATED)
+			return;
 		if(SoftTone.softToneCreate(this.pin) != 0)
 			throw new IllegalStateException("Unable to create softtone manager...");
 	}
@@ -58,6 +60,8 @@ public class Buzzer {
 	public void makeSound(int frequency, long duration) {
 		this.stopPlaying();
 		this.playing = new Thread(() -> {
+			if(SimulatedMode.IS_SIMULATED)
+				return;
 			SoftTone.softToneWrite(this.pin, frequency);
 			try {
 				Thread.sleep(duration);
@@ -78,6 +82,8 @@ public class Buzzer {
 		if(this.playing == null) return;
 		if(!this.playing.isAlive()) return;
 		this.playing.stop();
+		if(SimulatedMode.IS_SIMULATED)
+			return;
 		SoftTone.softToneWrite(pin, 0);
 	}
 	

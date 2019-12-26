@@ -14,12 +14,15 @@ import utils.JUnitGPIO;
  */
 public class SimulatedMode {
 	
+	public static boolean IS_SIMULATED = false;
+	
 	/**
 	 * Setup the SimulatedMode<br><br>
 	 * Define the GpioProvider to simulated<br>
 	 * Then simulate pressing button and displaying led state
 	 */
 	public static void setup() {
+		IS_SIMULATED = true;
         GpioProvider provider = new SimulatedGpioProvider();
         GpioFactory.setDefaultProvider(provider);
         System.out.println("Enabled system in simulated environment.");
@@ -28,7 +31,8 @@ public class SimulatedMode {
         new Thread(() -> {	
 			try {
 				Thread.sleep(3000L);//Just Waiting for system to be setup.
-				
+
+				System.out.println("First try");
 				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_26);
 				Thread.sleep(570L);
 				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_23);
@@ -38,7 +42,9 @@ public class SimulatedMode {
 				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_22);
 				Thread.sleep(300L);
 				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_21);
-				Thread.sleep(3000L);//Just Waiting for system to be setup.
+				Thread.sleep(3000L);
+				
+				System.out.println("Second try");
 				
 				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_26);
 				Thread.sleep(570L);
