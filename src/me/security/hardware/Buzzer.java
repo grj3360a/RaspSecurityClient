@@ -5,13 +5,24 @@ import com.pi4j.wiringpi.SoftTone;
 
 import me.security.simulation.SimulatedMode;
 
+/**
+ * This class use SoftTone.so lib and can't be used in a Simulated environnement
+ * @author Geraldes Jocelyn
+ * @since 26/12/2019
+ */
 public class Buzzer {
 	
 	private int pin;
 	private Thread multiple;
 	private Thread playing;
 
-	public Buzzer(Pin pin) throws IllegalStateException {
+	/**
+	 * @param pin The buzzer pin
+	 * @throws IllegalStateException SoftTone manager can reject the pin attribution if pin is not a PWM pin
+	 * @throws IllegalArgumentException Pin must not be null
+	 */
+	public Buzzer(Pin pin) throws IllegalArgumentException, IllegalStateException {
+		if(pin == null) throw new IllegalArgumentException("Pin can't be null");
 		this.pin = pin.getAddress();
 		if(SimulatedMode.IS_SIMULATED)
 			return;
@@ -19,18 +30,31 @@ public class Buzzer {
 			throw new IllegalStateException("Unable to create softtone manager...");
 	}
 	
+	/**
+	 * Produce a short sound for .2 seconds
+	 */
 	public void shortNote() {
 		this.makeSound(1000, 200L);
 	}
 	
+	/**
+	 * Produce a high pitched sound for .4 seconds
+	 */
 	public void buzzHighNote() {
 		this.makeSound(600, 400L);
 	}
 	
+	/**
+	 * Produce a low pitched sound for .4 seconds
+	 */
 	public void buzzLowNote() {
 		this.makeSound(300, 400L);
 	}
 	
+	/**
+	 * Produce multiple low pitched sound
+	 * @param howManyTimes How many times we produce this sound
+	 */
 	public void multipleLow(int howManyTimes) {
 		this.runInParallel(() -> {
 			for (int i = 0; i < howManyTimes; i++) {
@@ -42,6 +66,10 @@ public class Buzzer {
 		});
 	}
 	
+	/**
+	 * Produce multiple high pitched sound
+	 * @param howManyTimes How many times we produce this sound
+	 */
 	public void multipleHigh(int howManyTimes) {
 		this.runInParallel(() -> {
 			for (int i = 0; i < howManyTimes; i++) {
@@ -54,6 +82,9 @@ public class Buzzer {
 	}
 	
 	/**
+	 * Produce a sound of a certain frequency for a certain duration <br>
+	 * Note: We can't play multiple note at the same time<br>
+	 * Calling this method will not block this thread for the duration as it uses a separated thread.
 	 * @param frequency Play sound at this frequency
 	 * @param duration Make a sound for this duration
 	 */
@@ -71,12 +102,20 @@ public class Buzzer {
 		this.playing.start();
 	}
 	
+	/**
+	 * Launch a Runnable in parallel
+	 * @see multipleHigh();
+	 * @param r
+	 */
 	private void runInParallel(Runnable r) {
 		this.stopPlaying();
 		this.multiple = new Thread(r);
 		this.multiple.start();
 	}
 	
+	/**
+	 * Stop anything playing at this time
+	 */
 	@SuppressWarnings("deprecation")
 	private void stopPlaying() {
 		if(this.playing == null) return;
