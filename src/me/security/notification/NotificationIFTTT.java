@@ -38,7 +38,6 @@ public class NotificationIFTTT extends NotificationSender {
 	
 	//
 	
-	private final HttpClient httpClient;
 	private String event;
 	private String key;
 
@@ -48,7 +47,6 @@ public class NotificationIFTTT extends NotificationSender {
 		if(key == null) throw new IllegalArgumentException("Key must not be null");
 		if(key.length() != 22) throw new IllegalArgumentException("Key must be of size 22 characters");
 		
-		this.httpClient = HttpClientBuilder.create().build();
 		this.event = event;
 		this.key = key;
 	}
@@ -64,11 +62,12 @@ public class NotificationIFTTT extends NotificationSender {
 		if(values.isEmpty()) throw new IllegalArgumentException("values list is empty");
 		for(String v : values)
 			if(v == null || v.length() == 0) throw new IllegalArgumentException("values contains null or empty value");
-		
+
+		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPost request = new HttpPost("https://maker.ifttt.com/trigger/" + this.event + "/with/key/" + this.key);
 		request.addHeader("content-type", "application/json");
 		request.setEntity(new StringEntity(buildJson(values)));
-		HttpResponse hr = this.httpClient.execute(request);
+		HttpResponse hr = httpClient.execute(request);
 		
 		if(hr.getStatusLine().getStatusCode() != 200) throw new Exception("Response from IFTTT doesn't validate!");
 	}
