@@ -48,12 +48,12 @@ public class AppClient {
 		/*
 		 * Security handler
 		 */
-		new SecuManager(notif, db);
+		SecuManager secu = new SecuManager(notif, db);
 		
 		//Adding closing mechanism to shutdown DB connection
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			System.out.println("Closing RaspSecurityTest...");
-	    	db.close();
+			secu.close();
 		}));
 
 		System.out.println("Started successfuly.");

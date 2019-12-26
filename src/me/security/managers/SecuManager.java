@@ -1,5 +1,6 @@
 package me.security.managers;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import me.security.hardware.sensors.SensorType;
  * @author Geraldes Jocelyn
  * @since 24/11/2019
  */
-public class SecuManager {
+public class SecuManager implements Closeable {
 	
 	private final NotificationManager notif;
 	private final DatabaseManager db;
@@ -55,18 +56,15 @@ public class SecuManager {
 		this.blueLed = new DisplayElement(RaspiPin.GPIO_25);
 		this.blueLed.blinkIndefinitly();
 		this.redLed = new DisplayElement(RaspiPin.GPIO_24);
-		this.redLed.set(false);
 		this.yellowLed = new DisplayElement(RaspiPin.GPIO_27);
-		this.yellowLed.set(false);
 		this.greenLed = new DisplayElement(RaspiPin.GPIO_28);
-		this.greenLed.set(false);
 
 		this.alarm = new DisplayElement(RaspiPin.GPIO_16);
 		this.buzzer = new Buzzer(RaspiPin.GPIO_15);
 		
 		this.digicode = new Digicode
 				(this,
-				"1574", 
+				"1574",
 				new Pin[]{RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22, RaspiPin.GPIO_21},
 				new Pin[]{RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01, RaspiPin.GPIO_00});
 		
@@ -110,6 +108,20 @@ public class SecuManager {
 		this.greenLed.set(enabled);
 	}
 
+	@Override
+	public void close() {
+		this.buzzer.buzzHighNote();
+		this.alarm.set(false);
+		this.blueLed.set(false);
+		this.redLed.set(false);
+		this.yellowLed.set(false);
+		this.greenLed.set(false);
+		this.db.log("System shutdown...");
+		this.db.close();
+		
+		//TODO Save?
+	}
+
 	/**
 	 * Doesn't allow sensor list modification
 	 * @return The list of sensors
@@ -128,10 +140,6 @@ public class SecuManager {
 
 	public DisplayElement getYellowLed() {
 		return yellowLed;
-	}
-
-	public DisplayElement getGreenLed() {
-		return greenLed;
 	}
 
 	public Digicode getDigicode() {

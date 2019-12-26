@@ -55,7 +55,7 @@ public class SimulatedMode {
 				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_22);
 				Thread.sleep(300L);
 				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_21);
-			} catch (Exception e) {//We don't even care
+			} catch (Exception e) {//We don't even care on windows testing
 				e.printStackTrace();
 			}
 		}).start();
