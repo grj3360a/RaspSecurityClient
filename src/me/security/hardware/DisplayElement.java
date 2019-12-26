@@ -22,21 +22,13 @@ public class DisplayElement {
 		this.pin = GpioFactory.getInstance().provisionDigitalOutputPin(pin, "Display Element");
 		this.pin.setState(false);
 	}
-	
+
 	/**
-	 * Turn off the element, also disable blinking
+	 * Turn on or off the element, also disable blinking
 	 */
-	public void off() {
+	public void set(boolean state) {
 		this.pin.blink(0, 0L);
-		this.pin.setState(false);
-	}
-	
-	/**
-	 * Turn on the element, also disable current blinking
-	 */
-	public void on() {
-		this.pin.blink(0, 0L);
-		this.pin.setState(true);
+		this.pin.setState(state);
 	}
 	
 	/**

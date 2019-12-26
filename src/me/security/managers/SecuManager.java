@@ -55,11 +55,11 @@ public class SecuManager {
 		this.blueLed = new DisplayElement(RaspiPin.GPIO_25);
 		this.blueLed.blinkIndefinitly();
 		this.redLed = new DisplayElement(RaspiPin.GPIO_24);
-		this.redLed.off();
+		this.redLed.set(false);
 		this.yellowLed = new DisplayElement(RaspiPin.GPIO_27);
-		this.yellowLed.off();
+		this.yellowLed.set(false);
 		this.greenLed = new DisplayElement(RaspiPin.GPIO_28);
-		this.greenLed.off();
+		this.greenLed.set(false);
 
 		this.alarm = new DisplayElement(RaspiPin.GPIO_16);
 		this.buzzer = new Buzzer(RaspiPin.GPIO_15);
@@ -92,16 +92,14 @@ public class SecuManager {
 		this.notif.triggerAll("Détection d'un problème à " + sensorName + " : " + alertMessage);
 		this.db.alert(sensorName, alertMessage);
 		this.alarm.blinkIndefinitly();
-		this.redLed.on();
-		this.blueLed.off();
+		this.redLed.set(true);
 		this.alarmTriggered = true;
 	}
 
 	public void toggleAlarm(String code) {
 		if(this.enabled && this.alarmTriggered) {
-			this.alarm.off();
-			this.blueLed.blinkIndefinitly();
-			this.redLed.off();
+			this.alarm.set(false);
+			this.redLed.set(false);
 			this.db.log("Triggered alarm is now controlled by " + code);
 			this.notif.triggerFree("Alarme désactivée après une détection");
 		}
@@ -109,6 +107,7 @@ public class SecuManager {
 		this.db.log("Alarm toggled " + (enabled ? "ON" : "OFF") + " with code : " + code);
 		this.notif.triggerIFTTT("Alarme " + (enabled ? "activée" : "désactivée") + " avec le code " + code);
 		this.buzzer.buzzHighNote();
+		this.greenLed.set(enabled);
 	}
 
 	/**
@@ -121,10 +120,6 @@ public class SecuManager {
 
 	public Buzzer getBuzzer() {
 		return this.buzzer;
-	}
-
-	public DisplayElement getBlueLed() {
-		return blueLed;
 	}
 
 	public DisplayElement getRedLed() {

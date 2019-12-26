@@ -12,11 +12,11 @@ public class Test {
 		DisplayElement blueLed = new DisplayElement(RaspiPin.GPIO_25);
 		blueLed.blinkIndefinitly();
 		DisplayElement redLed = new DisplayElement(RaspiPin.GPIO_24);
-		redLed.off();
+		redLed.set(false);
 		DisplayElement yellowLed = new DisplayElement(RaspiPin.GPIO_27);
-		yellowLed.off();
+		yellowLed.set(false);
 		DisplayElement greenLed = new DisplayElement(RaspiPin.GPIO_28);
-		greenLed.off();
+		greenLed.set(false);
 
 		DisplayElement alarm = new DisplayElement(RaspiPin.GPIO_16);
 		Buzzer buzzer = new Buzzer(RaspiPin.GPIO_15);
