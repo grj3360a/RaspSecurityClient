@@ -172,7 +172,7 @@ public class Digicode {
 			if (this.nTypedBuffer >= BUFFER_SIZE) {
 				this.cleanBuffer();
 				this.secuManager.getYellowLed().pulse();
-				this.secuManager.getBuzzer().multipleLow(2);
+				this.secuManager.getBuzzer().multipleLow(1);
 				return;
 			}
 
@@ -244,7 +244,6 @@ public class Digicode {
 			this.secuManager.getDb().log("Passcode try but too many errors");
 			this.secuManager.getBuzzer().multipleHigh(5);
 			this.secuManager.getYellowLed().flashing();
-			// TODO Add more info ?
 			return;
 		} else if (this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
 			this.numberOfError -= 1;
@@ -258,11 +257,15 @@ public class Digicode {
 					this.activatingAlarmThread.stop();
 				}
 				
-				//Only on enabling
+				
 				this.activatingAlarmThread = new Thread(() -> {
 					try {
 						if(!secuManager.isEnabled()) {
+							secuManager.getBuzzer().success();
+							secuManager.getGreenLed().blinkIndefinitly();
 							Thread.sleep(WAIT_BEFORE_ACTIVATE);
+						} else {
+							secuManager.getBuzzer().closing();
 						}
 					} catch (InterruptedException e) {}
 					secuManager.toggleAlarm(new String(code));
@@ -282,11 +285,9 @@ public class Digicode {
 			this.secuManager.getDb().log("Passcode error on Digicode");
 			this.secuManager.getNotif().triggerIFTTT("Erreur de digicode...");
 			this.secuManager.getBuzzer().buzzLowNote();
+			this.secuManager.getYellowLed().flashing();
 		}
 
-		if (!this.secuManager.hasAlarmTriggered() && this.numberOfError >= MAXIMUM_NUMBER_OF_TRY) {
-			this.secuManager.triggerAlarm("Nombre d'erreur", "Tentative de désactivation de l'alarme hasardeuse !");
-		}
 	}
 
 	/**

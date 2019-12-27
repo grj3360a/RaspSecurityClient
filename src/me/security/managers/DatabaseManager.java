@@ -34,10 +34,9 @@ public class DatabaseManager implements AutoCloseable {
 	 * 
 	 * @return The created database manager
 	 * @throws IOException If 'database.password' file can't be readed
-	 * @throws SQLException If an error occured while connecting to the db
 	 * @throws IllegalStateException If the file doesn't respect the format
 	 */
-	public static DatabaseManager generateFromFile() throws IOException, SQLException, IllegalStateException {
+	public static DatabaseManager generateFromFile() throws IOException {
 		File dbPassword = new File("database.password");
 		System.out.println("Parsing " + dbPassword.getCanonicalPath() + " file");
 		
@@ -64,10 +63,9 @@ public class DatabaseManager implements AutoCloseable {
 	 * @param db The database name
 	 * @param user The username
 	 * @param password The corresponding password
-	 * @throws SQLException If the connection can't be initiated
 	 * @throws IllegalArgumentException If any argument is null
 	 */
-	public DatabaseManager(String domain, String db, String user, String password) throws SQLException, IllegalArgumentException {
+	public DatabaseManager(String domain, String db, String user, String password) throws IllegalArgumentException {
 		if(domain == null)
 			throw new IllegalArgumentException("Domain can't be null");
 		if(db == null)
@@ -90,10 +88,16 @@ public class DatabaseManager implements AutoCloseable {
 	 * @param password The corresponding password
 	 * @throws SQLException If the connection can't be initiated
 	 */
-	protected void initializeConnection(String domain, String db, String user, String password) throws SQLException {
+	protected void initializeConnection(String domain, String db, String user, String password) {
 		System.out.println("Establishing database connection (" + domain + ")...");
-		DriverManager.setLoginTimeout(1);
-		this.connection = DriverManager.getConnection("jdbc:mysql://" + domain + ":3306/" + db, user, password);
+		DriverManager.setLoginTimeout(3);
+		try {
+			this.connection = DriverManager.getConnection("jdbc:mysql://" + domain + ":3306/" + db + "?autoReconnect=true", user, password);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			//We can still run security without database
+			//autoReconnect option will do the rest for us
+		}
 	}
 
 	/**
@@ -132,13 +136,17 @@ public class DatabaseManager implements AutoCloseable {
 		System.out.println(info);
 		
 		try {
-			PreparedStatement stmt = connection.prepareStatement("INSERT INTO `logs`(`relatedToSensor`,`log_info`) VALUES (?,?)");
+			if(!isAlive())
+				return;
+			
+			PreparedStatement stmt = this.connection.prepareStatement("INSERT INTO `logs`(`relatedToSensor`,`log_info`) VALUES (?,?)");
 			stmt.setBoolean(1, relatedToSensor);
 			stmt.setString(2, info);
 			stmt.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			//Ignore the error as error on logging will not be damageable for our code
+			//Security system need to continue running even if we have errors
 		}
 	}
 	
@@ -147,8 +155,11 @@ public class DatabaseManager implements AutoCloseable {
 	 */
 	public List<Log> getLast10Logs(){
 		try {
+			if(!isAlive())
+				throw new IllegalStateException("Database connection seems dead.");
+			
 			List<Log> logs = new ArrayList<DatabaseManager.Log>();
-			Statement stmt = connection.createStatement();
+			Statement stmt = this.connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM `logs` ORDER BY `id_log` DESC LIMIT 10");
 			
 			while(rs.next()) {
@@ -165,14 +176,23 @@ public class DatabaseManager implements AutoCloseable {
 		}
 	}
 	
+	private boolean isAlive() {
+		try {
+			return this.connection != null && !this.connection.isClosed();
+		} catch (SQLException e) {
+			return false;
+		}
+	}
+	
 	@Override
 	public void close() {
 		try {
 			System.out.println("Closing connection...");
-			if(connection != null && !connection.isClosed()) connection.close();
+			if(this.connection != null && !this.connection.isClosed()) this.connection.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		this.connection = null;
 	}
 	
 	/**

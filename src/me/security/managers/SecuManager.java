@@ -44,8 +44,8 @@ public class SecuManager implements Closeable {
 	 * This will also run a RestAPIManager instance
 	 * @param notifications
 	 * @param db
-	 * @throws UnsatisfiedLinkError
-	 * @throws IOException
+	 * @throws UnsatisfiedLinkError If this doesn't run with required C libraries
+	 * @throws IOException RestAPI input output
 	 */
 	public SecuManager(NotificationManager notifications, DatabaseManager db) throws UnsatisfiedLinkError, IOException {
 		if(notifications == null) throw new IllegalArgumentException("NotificationManager cannot be null");
@@ -74,6 +74,9 @@ public class SecuManager implements Closeable {
 		//this.sensors.add(new Sensor(this, "Fenêtre arrière", SensorType.OPEN, RaspiPin.GPIO_31));
 		//this.sensors.add(new Sensor(this, "Chaleur salon", SensorType.HEAT, RaspiPin.GPIO_28));
 		//this.sensors.add(new Sensor(this, "Gaz salon", SensorType.GAS, RaspiPin.GPIO_24));
+		for(Sensor s : this.sensors) {
+			s.toggle();//TODO Remove and from save
+		}
 		
 		this.db.log("Initialized system correctly.\n" + this.notif.toString());
 		this.notif.triggerIFTTT("System initialized.");
@@ -140,6 +143,10 @@ public class SecuManager implements Closeable {
 
 	public DisplayElement getYellowLed() {
 		return yellowLed;
+	}
+
+	public DisplayElement getGreenLed() {
+		return this.greenLed;
 	}
 
 	public Digicode getDigicode() {

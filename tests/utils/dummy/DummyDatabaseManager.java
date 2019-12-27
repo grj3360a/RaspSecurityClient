@@ -17,7 +17,7 @@ public class DummyDatabaseManager extends DatabaseManager {
 	}
 
 	@Override
-	protected void initializeConnection(String domain, String db, String user, String password) throws SQLException {}
+	protected void initializeConnection(String domain, String db, String user, String password) {}
 	
 	@Override
 	protected void rawLog(boolean relatedToSensor, String info) throws IllegalArgumentException {}

@@ -41,7 +41,6 @@ public class NotificationFreeAPI extends NotificationSender {
 		}
 	}
 
-	private final HttpClient httpClient;
 	private final int user;
 	private final String password;
 	
@@ -56,7 +55,6 @@ public class NotificationFreeAPI extends NotificationSender {
 		if(user >= 100000000 || user <= 00100000) throw new IllegalArgumentException("User id not valid size"); // Magic values to mask FreeAPI user
 		if(password == null) throw new IllegalArgumentException("Password is null");
 		if(password.length() != 14) throw new IllegalArgumentException("Password not valid size");//Password will always be 14 chars
-		this.httpClient = HttpClientBuilder.create().build();
 		this.user = user;
 		this.password = password;
 		
@@ -77,8 +75,9 @@ public class NotificationFreeAPI extends NotificationSender {
 	@Override
 	public void trigger(String message) throws ClientProtocolException, IOException, IllegalArgumentException, IllegalStateException {
 		if(message == null || message.length() == 0) throw new IllegalArgumentException("Message cannot be null or empty.");
+		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpGet request = new HttpGet("https://smsapi.free-mobile.fr/sendmsg?user=" + user + "&pass=" + password + "&msg=" + URLEncoder.encode(message, "UTF-8"));
-		HttpResponse hr = this.httpClient.execute(request);
+		HttpResponse hr = httpClient.execute(request);
 		
 		switch(hr.getStatusLine().getStatusCode()) {
 		

@@ -1,7 +1,7 @@
 package me.security;
 
+import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import me.security.managers.DatabaseManager;
 import me.security.managers.NotificationManager;
@@ -14,14 +14,14 @@ import me.security.simulation.SimulatedMode;
  * @author Geraldes Jocelyn
  * @since 24/11/2019
  */
-public class AppClient {
+public class App {
 
 	/**
 	 * The main entry point of RaspSecurity.
 	 * Utilization of the argument --simulated is needed if running this on Windows
 	 */
-	public static void main(String[] args) throws IOException, SQLException {
-		System.out.println("Launching RaspSecurityTest...");
+	public static void main(String[] args) throws UnsatisfiedLinkError, IOException {
+		System.out.println("Launching RaspSecurityTest... (" + new File(".").getAbsolutePath() + ")");
 		for(String s : args) {
 			if(s.toLowerCase().equals("--simulated")) {
 				SimulatedMode.setup();

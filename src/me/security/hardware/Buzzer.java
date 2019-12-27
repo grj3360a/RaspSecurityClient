@@ -82,6 +82,34 @@ public class Buzzer {
 	}
 	
 	/**
+	 * Produce disabling sound
+	 */
+	public void closing() {
+		this.runInParallel(() -> {
+			for (int i = 1000; i >= 100; i-=300) {
+				this.makeSound(i, 300);
+				try {
+					Thread.sleep(600L);
+				} catch(InterruptedException ex) {}
+			}
+		});
+	}
+	
+	/**
+	 * Produce success sound
+	 */
+	public void success() {
+		this.runInParallel(() -> {
+			for (int i = 100; i <= 1000; i+=300) {
+				this.makeSound(i, 300);
+				try {
+					Thread.sleep(500L);
+				} catch(InterruptedException ex) {}
+			}
+		});
+	}
+	
+	/**
 	 * Produce a sound of a certain frequency for a certain duration <br>
 	 * Note: We can't play multiple note at the same time<br>
 	 * Calling this method will not block this thread for the duration as it uses a separated thread.
