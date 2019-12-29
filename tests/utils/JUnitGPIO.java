@@ -10,6 +10,7 @@ import com.pi4j.io.gpio.GpioPin;
 import com.pi4j.io.gpio.GpioProvider;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
+import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.SimulatedGpioProvider;
 import com.pi4j.io.gpio.event.PinEvent;
 import com.pi4j.io.gpio.event.PinListener;
@@ -58,6 +59,9 @@ public class JUnitGPIO {
 		}
 	}
 	
+	public static Pin[] lines = new Pin[]{RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22, RaspiPin.GPIO_21};
+	public static Pin[] columns = new Pin[]{RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01, RaspiPin.GPIO_00};
+	
 	/**
 	 * Simulate a button press on a digicode<br>
 	 * This is needed as pressing a button on the digicode will reverse power from columns to lines
@@ -65,20 +69,21 @@ public class JUnitGPIO {
 	 * @param c The column pin of this digicode
 	 * @param l The line pin of this digicode
 	 */
-	public static void pressDigicode(GpioProvider provider, Pin c, Pin l) {
+	public static void pressDigicode(Pin c, Pin l) {
+		GpioProvider p = GpioFactory.getDefaultProvider();
 		//Create a listener that will activate once when the column is proceeded
-		provider.addListener(l, new PinListener() {
+		p.addListener(l, new PinListener() {
 			boolean onlyOnce = false;
 			@Override
 			public void handlePinEvent(PinEvent event) {
-				if(provider.getState(l).isLow() && !onlyOnce) {
-					provider.setState(l, PinState.HIGH);
+				if(p.getState(l).isLow() && !onlyOnce) {
+					p.setState(l, PinState.HIGH);
 					onlyOnce = true;
 				}
 			}
 		});
 		//Activate the column
-		provider.setState(c, PinState.HIGH);
+		p.setState(c, PinState.HIGH);
 		try {
 			Thread.sleep(100L);
 		} catch (InterruptedException e) {}

@@ -54,30 +54,30 @@ public class DigicodeTest {
 	
 	@Test
 	public void testToggleOnAlarm() {
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
 		
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 		
 		assertTrue(secu.getDigicode().isActivating());
 	}
 
 	@Test
 	public void testToggleOnWithErrorAlarm() {
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_10);//6
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_02, RaspiPin.GPIO_10);//6
 
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_05);//*
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_05);//*
 
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
 		
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 
 		assertTrue(secu.getDigicode().isActivating());
 	}
@@ -85,29 +85,29 @@ public class DigicodeTest {
 	@Test
 	public void testAddPasscodeThenToggleOn() {
 		this.digi.addPasscode("4751");
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
 		
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 
 		assertTrue(secu.getDigicode().isActivating());
 	}
 
 	@Test
 	public void testToggleOnThenOffAlarm() {
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 		
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
-		JUnitGPIO.pressDigicode(gpio, RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_14);//1
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_03, RaspiPin.GPIO_10);//5
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_06);//7
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_04, RaspiPin.GPIO_10);//4
+		JUnitGPIO.pressDigicode(RaspiPin.GPIO_02, RaspiPin.GPIO_05);//#
 		
 		assertFalse(secu.isEnabled());
 	}

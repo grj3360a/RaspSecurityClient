@@ -1,5 +1,8 @@
 package me.security.simulation;
 
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioProvider;
 import com.pi4j.io.gpio.RaspiPin;
@@ -30,31 +33,19 @@ public class SimulatedMode {
         //Activating simulation.
         new Thread(() -> {	
 			try {
-				Thread.sleep(3000L);//Just Waiting for system to be setup.
+				// set look and feel to the system look and feel
+				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 
-				System.out.println("First try");
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_26);
-				Thread.sleep(570L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_23);
-				Thread.sleep(300L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_02, RaspiPin.GPIO_23);
-				Thread.sleep(300L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_22);
-				Thread.sleep(300L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_21);
-				Thread.sleep(3000L);
-				
-				System.out.println("Second try");
-				
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_26);
-				Thread.sleep(570L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_03, RaspiPin.GPIO_23);
-				Thread.sleep(300L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_02, RaspiPin.GPIO_23);
-				Thread.sleep(300L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_22);
-				Thread.sleep(300L);
-				JUnitGPIO.pressDigicode(provider, RaspiPin.GPIO_01, RaspiPin.GPIO_21);
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						new WindowedSimulator().setVisible(true);
+					}
+				});
 			} catch (Exception e) {//We don't even care on windows testing
 				e.printStackTrace();
 			}

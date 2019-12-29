@@ -26,7 +26,7 @@ public class Digicode {
 	private static final int BUFFER_SIZE = 4;
 	private static final int MAXIMUM_NUMBER_OF_TRY = 3;
 	private static final int WAIT_BEFORE_ACTIVATE = 30 * 1000;
-	private static final char[][] KEYS = { 
+	public static final char[][] KEYS = { 
 			{ '1', '2', '3', 'A' }, 
 			{ '4', '5', '6', 'B' }, 
 			{ '7', '8', '9', 'C' },
