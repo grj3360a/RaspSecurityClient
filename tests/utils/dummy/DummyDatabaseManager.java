@@ -1,6 +1,5 @@
 package utils.dummy;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,7 +11,7 @@ import me.security.managers.DatabaseManager;
  */
 public class DummyDatabaseManager extends DatabaseManager {
 
-	public DummyDatabaseManager() throws SQLException {
+	public DummyDatabaseManager() {
 		super("notnull", "notnull", "notnull", "notnull");
 	}
 
