@@ -26,27 +26,19 @@ public class SimulatedMode {
         GpioProvider provider = new SimulatedGpioProvider();
         GpioFactory.setDefaultProvider(provider);
         System.out.println("Enabled system in simulated environment.");
-        
-        //Activating simulation.
-        new Thread(() -> {	
-			try {
-				// set look and feel to the system look and feel
-				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
 
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						new WindowedSimulator().setVisible(true);
-					}
-				});
-			} catch (Exception e) {//We don't even care on windows testing
-				e.printStackTrace();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new WindowedSimulator().setVisible(true);
 			}
-		}).start();
+		});
 	}
 	
 }
