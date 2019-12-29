@@ -5,10 +5,7 @@ import javax.swing.UIManager;
 
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioProvider;
-import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.SimulatedGpioProvider;
-
-import utils.JUnitGPIO;
 
 /**
  * Allows to launch this program without Raspberry

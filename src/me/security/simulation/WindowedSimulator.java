@@ -19,8 +19,6 @@ import com.pi4j.io.gpio.GpioProvider;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.PinEvent;
-import com.pi4j.io.gpio.event.PinEventType;
-import com.pi4j.io.gpio.event.PinListener;
 
 import me.security.hardware.Digicode;
 import utils.JUnitGPIO;
@@ -31,7 +29,7 @@ public class WindowedSimulator extends JFrame {
 	public WindowedSimulator() {
 		super("Simulateur");
 		final GpioProvider provider = GpioFactory.getDefaultProvider();
-
+		
 		JPanel mainPanel = new JPanel(new GridBagLayout());
 		this.add(mainPanel);
 
@@ -121,6 +119,16 @@ public class WindowedSimulator extends JFrame {
 		
 		constraints.gridx++;
 		JLabel alarm = new JLabel(createImageIcon("/alarm/off.png"));
+		provider.addListener(RaspiPin.GPIO_16, (PinEvent event) -> {
+			switch(provider.getState(event.getPin())) {
+			case HIGH:
+				alarm.setIcon(createImageIcon("/alarm/on.png"));
+				break;
+			case LOW:
+				alarm.setIcon(createImageIcon("/alarm/off.png"));
+				break;
+			}
+		});
 		displayers.add(alarm);
 
 		mainPanel.add(displayers);
@@ -152,7 +160,7 @@ public class WindowedSimulator extends JFrame {
 		triggers.add(window, constraints);
 		
 		mainPanel.add(triggers);
-
+		
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

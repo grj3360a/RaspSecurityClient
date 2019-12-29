@@ -4,6 +4,7 @@ import com.pi4j.io.gpio.Pin;
 import com.pi4j.wiringpi.SoftTone;
 
 import me.security.simulation.SimulatedMode;
+import me.security.simulation.Sound;
 
 /**
  * This class use SoftTone.so lib and can't be used in a Simulated environnement
@@ -34,21 +35,21 @@ public class Buzzer {
 	 * Produce a short sound for .2 seconds
 	 */
 	public void shortNote() {
-		this.makeSound(1000, 200L);
+		this.makeSound(1000, 200);
 	}
 	
 	/**
 	 * Produce a high pitched sound for .4 seconds
 	 */
 	public void buzzHighNote() {
-		this.makeSound(600, 400L);
+		this.makeSound(600, 400);
 	}
 	
 	/**
 	 * Produce a low pitched sound for .4 seconds
 	 */
 	public void buzzLowNote() {
-		this.makeSound(300, 400L);
+		this.makeSound(300, 400);
 	}
 	
 	/**
@@ -116,11 +117,13 @@ public class Buzzer {
 	 * @param frequency Play sound at this frequency
 	 * @param duration Make a sound for this duration
 	 */
-	public void makeSound(int frequency, long duration) {
+	public void makeSound(int frequency, int duration) {
 		this.stopPlaying();
 		this.playing = new Thread(() -> {
-			if(SimulatedMode.IS_SIMULATED)
+			if(SimulatedMode.IS_SIMULATED) {
+				Sound.tone(frequency, duration, 0.1D);
 				return;
+			}
 			SoftTone.softToneWrite(this.pin, frequency);
 			try {
 				Thread.sleep(duration);
