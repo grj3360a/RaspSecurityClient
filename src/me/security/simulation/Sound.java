@@ -12,7 +12,7 @@ public class Sound {
 	public static float SAMPLE_RATE = 8000f;
 
 	public static void tone(int hz, int msecs) {
-		tone(hz, msecs, 1.0);
+		tone(hz, msecs, 0.1);
 	}
 
 	public static void tone(int hz, int msecs, double vol) {

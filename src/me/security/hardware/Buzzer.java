@@ -121,9 +121,10 @@ public class Buzzer {
 		this.stopPlaying();
 		this.playing = new Thread(() -> {
 			if(SimulatedMode.IS_SIMULATED) {
-				Sound.tone(frequency, duration, 0.1D);
+				Sound.tone(frequency, duration);
 				return;
 			}
+			
 			SoftTone.softToneWrite(this.pin, frequency);
 			try {
 				Thread.sleep(duration);
