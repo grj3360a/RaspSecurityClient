@@ -15,7 +15,7 @@ import me.security.simulation.SimulatedMode;
  * @since 24/11/2019
  */
 public class App {
-
+	
 	/**
 	 * The main entry point of RaspSecurity.
 	 * Utilization of the argument --simulated is needed if running this on Windows
@@ -49,6 +49,7 @@ public class App {
 		 * Security handler
 		 */
 		SecuManager secu = new SecuManager(notif, db);
+		SimulatedMode.launchSimulatedWindow(secu);
 		
 		//Adding closing mechanism to shutdown DB connection
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {

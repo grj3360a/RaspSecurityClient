@@ -5,6 +5,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -21,16 +23,26 @@ import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.PinEvent;
 
 import me.security.hardware.Digicode;
+import me.security.managers.SecuManager;
 import utils.JUnitGPIO;
 
 @SuppressWarnings("serial")
 public class WindowedSimulator extends JFrame {
+	
+	private JLabel notificationLabel = new JLabel("Liste des notifications :");
+	
+	public List<String> notifs = new ArrayList<String>();
 
-	public WindowedSimulator() {
+	public WindowedSimulator(SecuManager secu) {
 		super("Simulateur");
 		final GpioProvider provider = GpioFactory.getDefaultProvider();
 		
 		JPanel mainPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints mainConstraints = new GridBagConstraints();
+		mainConstraints.anchor = GridBagConstraints.CENTER;
+		mainConstraints.insets = new Insets(10, 10, 10, 10);
+		mainConstraints.gridx = 0;
+		mainConstraints.gridy = 0;
 		this.add(mainPanel);
 
 		JPanel digicode = new JPanel(new GridBagLayout());
@@ -55,7 +67,7 @@ public class WindowedSimulator extends JFrame {
 			}
 		}
 
-		mainPanel.add(digicode);
+		mainPanel.add(digicode, mainConstraints);
 		
 		JPanel displayers = new JPanel(new GridBagLayout());
 		displayers.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Affichage"));
@@ -131,7 +143,8 @@ public class WindowedSimulator extends JFrame {
 		});
 		displayers.add(alarm);
 
-		mainPanel.add(displayers);
+		mainConstraints.gridx++;
+		mainPanel.add(displayers, mainConstraints);
 		
 		JPanel triggers = new JPanel(new GridBagLayout());
 		triggers.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Déclencheurs"));
@@ -158,14 +171,24 @@ public class WindowedSimulator extends JFrame {
 			provider.setState(RaspiPin.GPIO_07, PinState.LOW);
 		});
 		triggers.add(window, constraints);
+
+		mainConstraints.gridx++;
+		mainPanel.add(triggers, mainConstraints);
 		
-		mainPanel.add(triggers);
-		
+
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
-
+	
+	public void updateNotificationLabel() {
+		String preparedString = "Notifications :\n";
+		for(String notif : notifs) {
+			preparedString += notif + "\n";
+		}
+		this.notificationLabel.setText(preparedString);
+	}
+	
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	protected ImageIcon createImageIcon(String path) {
 		URL imgURL = getClass().getResource(path);

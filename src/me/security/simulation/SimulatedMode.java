@@ -7,6 +7,8 @@ import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioProvider;
 import com.pi4j.io.gpio.SimulatedGpioProvider;
 
+import me.security.managers.SecuManager;
+
 /**
  * Allows to launch this program without Raspberry
  * @author Geraldes Jocelyn
@@ -26,7 +28,9 @@ public class SimulatedMode {
         GpioProvider provider = new SimulatedGpioProvider();
         GpioFactory.setDefaultProvider(provider);
         System.out.println("Enabled system in simulated environment.");
+	}
 
+	public static void launchSimulatedWindow(SecuManager secu) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
@@ -36,7 +40,7 @@ public class SimulatedMode {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new WindowedSimulator().setVisible(true);
+				new WindowedSimulator(secu).setVisible(true);
 			}
 		});
 	}
