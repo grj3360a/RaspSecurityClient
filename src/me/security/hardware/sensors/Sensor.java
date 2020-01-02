@@ -18,9 +18,9 @@ public class Sensor {
 	
 	public static int AUTO_INCREMENT = 0;
 	
-	@Expose private final int id = (AUTO_INCREMENT = AUTO_INCREMENT + 1);
-	@Expose private boolean isEnabled = false;
-	@Expose private long lastActivated = -1L;
+	@Expose private final int id;
+	@Expose private boolean isEnabled;
+	@Expose private long lastActivated;
 			private final SecuManager manager;
 	@Expose private final String name;
 	@Expose private final SensorType type;
@@ -32,12 +32,16 @@ public class Sensor {
 	 * @param name The name of the sensor, or where it is located
 	 * @param type The type of the sensor, this will defined it behavior in triggering
 	 * @param pin The connected pin
+	 * @throws IllegalArgumentException All elements must be different from null
 	 */
 	public Sensor(SecuManager manager, String name, SensorType type, Pin pin) {
-		if(manager == null) throw new IllegalArgumentException();
-		if(name == null) throw new IllegalArgumentException();
-		if(pin == null) throw new IllegalArgumentException();
-		if(type == null) throw new IllegalArgumentException();
+		if(manager == null) throw new IllegalArgumentException("SecuManager cannot be null");
+		if(name == null) throw new IllegalArgumentException("Sensor must have a name");
+		if(type == null) throw new IllegalArgumentException("Sensor must have a type");
+		if(pin == null) throw new IllegalArgumentException("Sensor must be connected to a pin");
+		this.id = (AUTO_INCREMENT = AUTO_INCREMENT + 1);
+		this.isEnabled = false;
+		this.lastActivated = -1L;
 		this.manager = manager;
 		this.name = name;
 		this.pin = GpioFactory.getInstance().provisionDigitalInputPin(pin, "Sensor " + type + " " + name);
