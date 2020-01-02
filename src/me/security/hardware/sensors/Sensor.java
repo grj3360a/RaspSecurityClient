@@ -87,7 +87,8 @@ public class Sensor {
 	
 	/**
 	 * Trigger this sensor, this will have an effect only if this sensor is enabled<br>
-	 * and the last time it was activated is superior to the activation threshold is passed 
+	 * and the last time it was activated is superior to the activation threshold 
+	 * @see SensorType.getTimeBetweenActivation()
 	 * @return Return true if this trigger had an effect on the alarm.
 	 */
 	public boolean trigger() {

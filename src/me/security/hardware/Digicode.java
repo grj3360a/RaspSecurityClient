@@ -23,9 +23,10 @@ import me.security.managers.SecuManager;
  */
 public class Digicode {
 
-	private static final int BUFFER_SIZE = 4;
+	private static final int BUFFER_SIZE = 4;//Maximum number of element of a code
 	private static final int MAXIMUM_NUMBER_OF_TRY = 3;
-	private static final int WAIT_BEFORE_ACTIVATE = 30 * 1000;
+	private static final int WAIT_BEFORE_ACTIVATE = 15 * 1000;//Time between a valid code, and the alarm activation
+	
 	public static final char[][] KEYS = { 
 			{ '1', '2', '3', 'A' }, 
 			{ '4', '5', '6', 'B' }, 
@@ -42,8 +43,8 @@ public class Digicode {
 	private int numberOfError;
 	private Thread activatingAlarmThread;//Is the digicode currently waiting to activate the alarm
 
-	private final GpioPinDigitalMultipurpose[] padc;
-	private final GpioPinDigitalMultipurpose[] padl;
+	private final GpioPinDigitalMultipurpose[] padc;//Columns gpio pins
+	private final GpioPinDigitalMultipurpose[] padl;//Lines gpio pins
 
 	/**
 	 * Build a digicode from pins and a default code
@@ -83,10 +84,16 @@ public class Digicode {
 		this.timeLastError = 0;
 		this.numberOfError = 0;
 
-		this.padc = new GpioPinDigitalMultipurpose[] { provisionPin(columns, 0), provisionPin(columns, 1),
-				provisionPin(columns, 2), provisionPin(columns, 3) };
-		this.padl = new GpioPinDigitalMultipurpose[] { provisionPin(lines, 0), provisionPin(lines, 1),
-				provisionPin(lines, 2), provisionPin(lines, 3) };
+		this.padc = new GpioPinDigitalMultipurpose[] { 
+				provisionPin(columns, 0), 
+				provisionPin(columns, 1),
+				provisionPin(columns, 2), 
+				provisionPin(columns, 3) };
+		this.padl = new GpioPinDigitalMultipurpose[] { 
+				provisionPin(lines, 0), 
+				provisionPin(lines, 1),
+				provisionPin(lines, 2), 
+				provisionPin(lines, 3) };
 
 		this.setupLinesColumnsState();
 

@@ -1,9 +1,13 @@
 package me.security.managers;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.io.FileUtils;
 
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
@@ -26,6 +30,7 @@ public class SecuManager implements Closeable {
 
 	private boolean enabled = false;
 	private boolean alarmTriggered = false;
+	private File saveFile;
 	
 	private List<Sensor> sensors;
 	private DisplayElement blueLed;
@@ -52,6 +57,8 @@ public class SecuManager implements Closeable {
 		if(db == null) throw new IllegalArgumentException("DatabaseManager cannot be null");
 		this.notif = notifications;
 		this.db = db;
+		
+		this.saveFile = new File("alarm.dat");
 
 		this.blueLed = new DisplayElement(RaspiPin.GPIO_25);
 		this.blueLed.blinkIndefinitly();
@@ -82,6 +89,15 @@ public class SecuManager implements Closeable {
 		this.notif.triggerIFTTT("System initialized.");
 
 		this.restApi = new RestAPIManager(this);
+		
+		try{
+			String saved = FileUtils.readFileToString(this.saveFile, StandardCharsets.UTF_8);
+			if(Boolean.parseBoolean(saved)) {
+				this.toggleAlarm("SAVE");
+			}
+		} catch(IOException ex) {
+			ex.printStackTrace();//Can't do anything about it.
+		}
 	}
 	
 	public void triggerAlarm(String sensorName, String alertMessage) {
@@ -105,14 +121,24 @@ public class SecuManager implements Closeable {
 			this.notif.triggerFree("Alarme désactivée après une détection");
 		}
 		this.enabled = !enabled;
+		this.saveAlarmState();
 		this.db.log("Alarm toggled " + (enabled ? "ON" : "OFF") + " with code : " + code);
 		this.notif.triggerIFTTT("Alarme " + (enabled ? "activée" : "désactivée") + " avec le code " + code);
 		this.buzzer.buzzHighNote();
 		this.greenLed.set(enabled);
 	}
+	
+	public void saveAlarmState() {
+		try {
+			FileUtils.write(this.saveFile, this.isEnabled() + "", StandardCharsets.UTF_8);
+		} catch (IOException e) { // Saving alarm must not fail, otherwise can't do anything about it.
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public void close() {
+		this.saveAlarmState();
 		this.buzzer.buzzHighNote();
 		this.alarm.set(false);
 		this.blueLed.set(false);
@@ -121,8 +147,6 @@ public class SecuManager implements Closeable {
 		this.greenLed.set(false);
 		this.db.log("System shutdown...");
 		this.db.close();
-		
-		//TODO Save?
 	}
 
 	/**

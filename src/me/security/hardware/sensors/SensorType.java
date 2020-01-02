@@ -17,6 +17,10 @@ public enum SensorType {
 	private final long timeBetweenActivation;
 	private final String alert;
 	
+	/**
+	 * @param timeBetweenActivation The time between each activation of the alarm if this type of sensor is triggered
+	 * @param alert Alerte message sended
+	 */
 	private SensorType(long timeBetweenActivation, String alert) {
 		this.timeBetweenActivation = timeBetweenActivation;
 		this.alert = alert;

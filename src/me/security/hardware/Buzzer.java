@@ -7,7 +7,7 @@ import me.security.simulation.SimulatedMode;
 import me.security.simulation.Sound;
 
 /**
- * This class use SoftTone.so lib and can't be used in a Simulated environnement
+ * This class use SoftTone.so lib and can't be used in a Simulated environment
  * @author Geraldes Jocelyn
  * @since 26/12/2019
  */
