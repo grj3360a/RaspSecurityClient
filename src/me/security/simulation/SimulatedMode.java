@@ -31,6 +31,7 @@ public class SimulatedMode {
 	}
 
 	public static void launchSimulatedWindow(SecuManager secu) {
+		if(!IS_SIMULATED) return;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {

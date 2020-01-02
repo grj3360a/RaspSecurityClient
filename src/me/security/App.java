@@ -49,7 +49,9 @@ public class App {
 		 * Security handler
 		 */
 		SecuManager secu = new SecuManager(notif, db);
-		SimulatedMode.launchSimulatedWindow(secu);
+		
+		if(SimulatedMode.IS_SIMULATED)
+			SimulatedMode.launchSimulatedWindow(secu);
 		
 		//Adding closing mechanism to shutdown DB connection
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
