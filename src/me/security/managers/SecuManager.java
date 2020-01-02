@@ -164,11 +164,11 @@ public class SecuManager implements Closeable {
 	}
 
 	public DisplayElement getRedLed() {
-		return redLed;
+		return this.redLed;
 	}
 
 	public DisplayElement getYellowLed() {
-		return yellowLed;
+		return this.yellowLed;
 	}
 
 	public DisplayElement getGreenLed() {

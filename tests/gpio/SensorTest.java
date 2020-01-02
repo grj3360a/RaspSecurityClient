@@ -53,8 +53,8 @@ public class SensorTest {
 	public void setUp() throws Exception {
 		this.secu = new SecuManager(new NotificationManager(), new DummyDatabaseManager());
 		Sensor.AUTO_INCREMENT = 100;
-		this.s1 = new Sensor(secu, "S1", SensorType.MOTION, RaspiPin.GPIO_01);
-		this.s2 = new Sensor(secu, "S2", SensorType.OPEN, RaspiPin.GPIO_23);
+		this.s1 = new Sensor(secu, "S1", SensorType.MOTION, RaspiPin.GPIO_13);
+		this.s2 = new Sensor(secu, "S2", SensorType.OPEN, RaspiPin.GPIO_14);
 	}
 
 	@After
@@ -94,8 +94,8 @@ public class SensorTest {
 		this.secu.toggleAlarm("JUnit");
 		this.s1.toggle();
 
-		gpio.setState(RaspiPin.GPIO_01, PinState.HIGH);
-		gpio.setState(RaspiPin.GPIO_01, PinState.LOW);
+		gpio.setState(RaspiPin.GPIO_13, PinState.HIGH);
+		gpio.setState(RaspiPin.GPIO_13, PinState.LOW);
 		
 		Thread.sleep(300L);//We have to wait as the SimulatedRaspi is async thread that can't be var synchronized -_-
 
