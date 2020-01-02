@@ -3,8 +3,10 @@ package me.security.notification;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -12,6 +14,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+
+import com.google.gson.Gson;
 
 /**
  * Notification implementation of the IFFT api
@@ -37,6 +41,7 @@ public class NotificationIFTTT extends NotificationSender {
 	}
 	
 	//
+	private static final Gson GSON = new Gson();
 	
 	private String event;
 	private String key;
@@ -65,8 +70,8 @@ public class NotificationIFTTT extends NotificationSender {
 
 		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPost request = new HttpPost("https://maker.ifttt.com/trigger/" + this.event + "/with/key/" + this.key);
-		request.addHeader("content-type", "application/json");
-		request.setEntity(new StringEntity(buildJson(values)));
+		request.addHeader("content-type", "application/json; charset=UTF-8");
+		request.setEntity(new StringEntity(buildJson(values), StandardCharsets.UTF_8));
 		HttpResponse hr = httpClient.execute(request);
 		
 		if(hr.getStatusLine().getStatusCode() != 200) throw new Exception("Response from IFTTT doesn't validate!");
@@ -79,14 +84,13 @@ public class NotificationIFTTT extends NotificationSender {
 	 */
 	private String buildJson(List<String> values) {
 		if(values.size() > 3) throw new IllegalArgumentException("IFTTT doesn't accept more than 3 values.");
+		HashMap<String, String> map = new HashMap<String, String>();
 		
-		String json = "";
 		for (int i = 0; i < values.size(); i++) {
-			json += String.format("\"value%d\":\"%s\"", i+1, values.get(i));
-			if (i < values.size() - 1) json += ",";
+			map.put("value" + i, values.get(i));
 		}
 		
-		return "{" + json + "}";
+		return GSON.toJson(map);
 	}
 
 	@Override
