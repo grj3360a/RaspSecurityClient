@@ -5,7 +5,6 @@ import com.pi4j.wiringpi.SoftTone;
 
 import me.security.simulation.SimulatedMode;
 import me.security.simulation.Sound;
-import utils.JUnitUtil;
 
 /**
  * This class use SoftTone.so lib and can't be used in a Simulated environment
@@ -26,7 +25,7 @@ public class Buzzer {
 	public Buzzer(Pin pin) throws IllegalArgumentException, IllegalStateException {
 		if(pin == null) throw new IllegalArgumentException("Pin can't be null");
 		this.pin = pin.getAddress();
-		if(SimulatedMode.IS_SIMULATED || JUnitUtil.isJUnitTest())
+		if(SimulatedMode.IS_SIMULATED)
 			return;
 		if(SoftTone.softToneCreate(this.pin) != 0)
 			throw new IllegalStateException("Unable to create softtone manager...");
@@ -119,7 +118,6 @@ public class Buzzer {
 	 * @param duration Make a sound for this duration
 	 */
 	public void makeSound(int frequency, int duration) {
-		if(JUnitUtil.isJUnitTest()) return;
 		this.stopPlaying();
 		this.playing = new Thread(() -> {
 			if(SimulatedMode.IS_SIMULATED) {

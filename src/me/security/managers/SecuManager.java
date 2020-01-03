@@ -24,6 +24,9 @@ import me.security.hardware.sensors.SensorType;
  */
 public class SecuManager implements Closeable {
 	
+	public static final Pin[] digiLines = new Pin[]{RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22, RaspiPin.GPIO_21};
+	public static final Pin[] digiColumns = new Pin[]{RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01, RaspiPin.GPIO_00};
+	
 	private final NotificationManager notif;
 	private final DatabaseManager db;
 	private RestAPIManager restApi;
@@ -72,8 +75,8 @@ public class SecuManager implements Closeable {
 		this.digicode = new Digicode
 				(this,
 				"1574",
-				new Pin[]{RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22, RaspiPin.GPIO_21},
-				new Pin[]{RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01, RaspiPin.GPIO_00});
+				digiLines,
+				digiColumns);
 		
 		this.sensors = new ArrayList<Sensor>();
 		this.sensors.add(new Sensor(this, "Mouvement salon", SensorType.MOTION, RaspiPin.GPIO_04));

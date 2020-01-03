@@ -8,6 +8,7 @@ import com.pi4j.io.gpio.GpioProvider;
 import com.pi4j.io.gpio.SimulatedGpioProvider;
 
 import me.security.managers.SecuManager;
+import utils.JUnitUtil;
 
 /**
  * Allows to launch this program without Raspberry
@@ -16,7 +17,7 @@ import me.security.managers.SecuManager;
  */
 public class SimulatedMode {
 	
-	public static boolean IS_SIMULATED = false;
+	public static boolean IS_SIMULATED = JUnitUtil.isJUnitTest();
 	
 	/**
 	 * Setup the SimulatedMode<br><br>

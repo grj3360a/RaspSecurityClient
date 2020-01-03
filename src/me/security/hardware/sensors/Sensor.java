@@ -16,7 +16,7 @@ import me.security.managers.SecuManager;
  */
 public class Sensor {
 	
-	private static final long WAIT_BEFORE_TRIGGER = 15 * 1000L;
+	public static final long WAIT_BEFORE_TRIGGER = 15 * 1000L;
 	public static int AUTO_INCREMENT = 0;
 	
 	@Expose private final int id;
@@ -87,6 +87,13 @@ public class Sensor {
 	 */
 	public void toggle() {
 		this.isEnabled = !this.isEnabled;
+	}
+	
+	/**
+	 * @return Is currently triggering alarm (counting down 'WAIT_BEFORE_TRIGGER')
+	 */
+	public boolean isTriggering() {
+		return this.triggering != null && this.triggering.isAlive();
 	}
 	
 	/**

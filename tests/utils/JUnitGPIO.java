@@ -10,10 +10,12 @@ import com.pi4j.io.gpio.GpioPin;
 import com.pi4j.io.gpio.GpioProvider;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.SimulatedGpioProvider;
 import com.pi4j.io.gpio.event.PinEvent;
 import com.pi4j.io.gpio.event.PinListener;
+
+import me.security.hardware.Digicode;
+import me.security.managers.SecuManager;
 
 /**
  * Used in JUnit test to define gpio state to simulate
@@ -59,8 +61,25 @@ public class JUnitGPIO {
 		}
 	}
 	
-	public static Pin[] lines = new Pin[]{RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22, RaspiPin.GPIO_21};
-	public static Pin[] columns = new Pin[]{RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01, RaspiPin.GPIO_00};
+	/**
+	 * Simulate a button press on a digicode<br>
+	 * This is needed when pressing a button on the digicode, this will power column pin, then will reverse power from columns to lines
+	 * @param provider The provider needed to handle pin activation
+	 * @param c The key to press
+	 * @throws IllegalArgumentException The char must be part of Digicode.KEYS
+	 */
+	public static void pressDigicode(char c) throws IllegalArgumentException {
+		boolean finded = false;
+		for (int y = 0; y < Digicode.KEYS.length; y++) {
+			for (int x = 0; x < Digicode.KEYS[y].length; x++) {
+				if(Digicode.KEYS[y][x] == c) {
+					finded = true;
+					pressDigicodeWithPins(SecuManager.digiColumns[x], SecuManager.digiLines[y]);
+				}
+			}
+		}
+		if(!finded) throw new IllegalArgumentException("This char is not a Digicode key.");
+	}
 	
 	/**
 	 * Simulate a button press on a digicode<br>
@@ -69,7 +88,7 @@ public class JUnitGPIO {
 	 * @param c The column pin of this digicode
 	 * @param l The line pin of this digicode
 	 */
-	public static void pressDigicode(Pin c, Pin l) {
+	public static void pressDigicodeWithPins(Pin c, Pin l) {
 		GpioProvider p = GpioFactory.getDefaultProvider();
 		//Create a listener that will activate once when the column is proceeded
 		p.addListener(l, new PinListener() {

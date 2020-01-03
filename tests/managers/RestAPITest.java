@@ -22,6 +22,7 @@ import com.pi4j.io.gpio.SimulatedGpioProvider;
 import me.security.managers.NotificationManager;
 import me.security.managers.RestAPIManager;
 import me.security.managers.SecuManager;
+import me.security.simulation.SimulatedMode;
 import utils.JUnitGPIO;
 import utils.dummy.DummyDatabaseManager;
 
@@ -35,6 +36,7 @@ public class RestAPITest {
     	jUnitAppPassword = "eaz897hfg654kiu714sf32d1";
         gpio = new SimulatedGpioProvider();
         GpioFactory.setDefaultProvider(gpio);
+        SimulatedMode.IS_SIMULATED = true;//We are running on Windows
     }
     
     @AfterClass

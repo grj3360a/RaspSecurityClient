@@ -89,6 +89,9 @@ public class SensorTest {
 		assertTrue(this.s1.isEnabled());
 	}
 
+	/**
+	 * This test is very long as we have to wait Sensor.WAIT_BEFORE_TRIGGER
+	 */
 	@Test
 	public void testTrigger() throws InterruptedException {
 		this.secu.toggleAlarm("JUnit");
@@ -98,8 +101,10 @@ public class SensorTest {
 		gpio.setState(RaspiPin.GPIO_13, PinState.LOW);
 		
 		Thread.sleep(300L);//We have to wait as the SimulatedRaspi is async thread that can't be var synchronized -_-
-
-		assertTrue(secu.hasAlarmTriggered());
+		assertTrue(this.s1.isTriggering());
+		
+		Thread.sleep(Sensor.WAIT_BEFORE_TRIGGER);
+		assertTrue(this.secu.hasAlarmTriggered());
 	}
 
 }

@@ -61,7 +61,7 @@ public class WindowedSimulator extends JFrame {
 				final int tmpX = x;
 				final int tmpY = y;
 				digiButton.addActionListener((ActionEvent e) -> {
-					JUnitGPIO.pressDigicode(JUnitGPIO.columns[tmpX], JUnitGPIO.lines[tmpY]);
+					JUnitGPIO.pressDigicodeWithPins(SecuManager.digiColumns[tmpX], SecuManager.digiLines[tmpY]);
 				});
 				digicode.add(digiButton, constraints);
 			}

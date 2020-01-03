@@ -30,9 +30,7 @@ public class Sound {
 			sdl.drain();
 			sdl.stop();
 			sdl.close();
-		} catch(LineUnavailableException e) {
-			e.printStackTrace();
-		}
+		} catch(LineUnavailableException e) {} //Multiple sound at the same time..
 	}
 
 }
