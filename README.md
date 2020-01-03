@@ -1,4 +1,4 @@
-# RaspSecurityTest
+# RaspSecurity
 
 This project is an implementation of a security system based on a Raspberry Pi linked to sensors and buttons.
 

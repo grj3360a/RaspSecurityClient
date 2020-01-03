@@ -89,17 +89,6 @@ public class SecuManager implements Closeable {
 		this.notif.triggerIFTTT("System initialized.");
 
 		this.restApi = new RestAPIManager(this);
-		
-		try{
-			if(this.saveFile.exists()) {
-				String saved = FileUtils.readFileToString(this.saveFile, StandardCharsets.UTF_8);
-				if(Boolean.parseBoolean(saved)) {
-					this.toggleAlarm("SAVE");
-				}
-			}
-		} catch(IOException ex) {
-			ex.printStackTrace();//Can't do anything about it.
-		}
 	}
 	
 	public void triggerAlarm(String sensorName, String alertMessage) {

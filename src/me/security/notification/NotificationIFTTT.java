@@ -87,7 +87,7 @@ public class NotificationIFTTT extends NotificationSender {
 		HashMap<String, String> map = new HashMap<String, String>();
 		
 		for (int i = 0; i < values.size(); i++) {
-			map.put("value" + i, values.get(i));
+			map.put("value" + (i+1), values.get(i));
 		}
 		
 		return GSON.toJson(map);
