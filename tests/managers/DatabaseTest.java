@@ -20,7 +20,7 @@ import me.security.managers.DatabaseManager;
 import me.security.managers.DatabaseManager.Log;
 
 public class DatabaseTest {
-	
+
 	private DatabaseManager db;
 
 	@Before
@@ -33,7 +33,7 @@ public class DatabaseTest {
 		this.db.close();
 		this.db = null;
 	}
-	
+
 	@Test
 	public void connectionValid() throws SQLException {
 		Connection c = getConnection(this.db);
@@ -46,10 +46,11 @@ public class DatabaseTest {
 		this.db.log("JUnit Test");
 		Statement stmt = getConnection(this.db).createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT * FROM `logs` ORDER BY `id_log` DESC LIMIT 1");
-		while(rs.next()) {
+		while (rs.next()) {
 			assertEquals("JUnit Test", rs.getString("log_info"));
 			assertFalse(rs.getBoolean("relatedToSensor"));
-			getConnection(this.db).createStatement().execute("DELETE FROM `logs` WHERE `id_log` = " + rs.getInt("id_log"));
+			getConnection(this.db).createStatement()
+					.execute("DELETE FROM `logs` WHERE `id_log` = " + rs.getInt("id_log"));
 		}
 		assertTrue(rs.first());
 	}
@@ -59,10 +60,11 @@ public class DatabaseTest {
 		this.db.alert("sensorName", "alertMessage");
 		Statement stmt = getConnection(this.db).createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT * FROM `logs` ORDER BY `id_log` DESC LIMIT 1");
-		while(rs.next()) {
+		while (rs.next()) {
 			assertEquals("Detection sensorName (alertMessage)", rs.getString("log_info"));
 			assertTrue(rs.getBoolean("relatedToSensor"));
-			getConnection(this.db).createStatement().execute("DELETE FROM `logs` WHERE `id_log` = " + rs.getInt("id_log"));
+			getConnection(this.db).createStatement()
+					.execute("DELETE FROM `logs` WHERE `id_log` = " + rs.getInt("id_log"));
 		}
 		assertTrue(rs.first());
 	}
@@ -79,13 +81,13 @@ public class DatabaseTest {
 		this.db.log("JUnit Test 8");
 		this.db.log("JUnit Test 9");
 		this.db.log("JUnit Test 10");
-		
+
 		List<Log> logs = this.db.getLast10Logs();
 		assertNotNull(logs);
 		assertFalse(logs.isEmpty());
-		
+
 		int i = 10;
-		for(Log l : logs) {
+		for (Log l : logs) {
 			assertNotNull(l);
 			assertEquals("JUnit Test " + i, l.info);
 			assertFalse(l.relatedToSensor);
@@ -94,14 +96,15 @@ public class DatabaseTest {
 			i--;
 		}
 	}
-	
+
 	/**
-	 * We don't want Connection field to be available, but we must test things with a sql Connection object
-	 * So we bypass runtime protection during tests with some reflection on DatabaseManager.
+	 * We don't want Connection field to be available, but we must test things with
+	 * a sql Connection object So we bypass runtime protection during tests with
+	 * some reflection on DatabaseManager.
 	 */
 	public static Connection getConnection(DatabaseManager db) {
-		for(Field f : DatabaseManager.class.getDeclaredFields()) {
-			if(f.getType() == Connection.class) {
+		for (Field f : DatabaseManager.class.getDeclaredFields()) {
+			if (f.getType() == Connection.class) {
 				f.setAccessible(true);
 				try {
 					return (Connection) f.get(db);
@@ -112,5 +115,5 @@ public class DatabaseTest {
 		}
 		return null;
 	}
-	
+
 }

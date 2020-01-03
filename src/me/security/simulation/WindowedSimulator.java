@@ -28,15 +28,15 @@ import utils.JUnitGPIO;
 
 @SuppressWarnings("serial")
 public class WindowedSimulator extends JFrame {
-	
+
 	private JLabel notificationLabel = new JLabel("Liste des notifications :");
-	
+
 	public List<String> notifs = new ArrayList<String>();
 
 	public WindowedSimulator(SecuManager secu) {
 		super("Simulateur");
 		final GpioProvider provider = GpioFactory.getDefaultProvider();
-		
+
 		JPanel mainPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints mainConstraints = new GridBagConstraints();
 		mainConstraints.anchor = GridBagConstraints.CENTER;
@@ -57,7 +57,7 @@ public class WindowedSimulator extends JFrame {
 				constraints.gridx = x;
 				constraints.gridy = y;
 				JButton digiButton = new JButton(Digicode.KEYS[y][x] + "");
-				
+
 				final int tmpX = x;
 				final int tmpY = y;
 				digiButton.addActionListener((ActionEvent e) -> {
@@ -68,7 +68,7 @@ public class WindowedSimulator extends JFrame {
 		}
 
 		mainPanel.add(digicode, mainConstraints);
-		
+
 		JPanel displayers = new JPanel(new GridBagLayout());
 		displayers.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Affichage"));
 
@@ -76,7 +76,7 @@ public class WindowedSimulator extends JFrame {
 		constraints.gridy = 0;
 		final JLabel red = new JLabel(createImageIcon("/leds/off.png"));
 		provider.addListener(RaspiPin.GPIO_24, (PinEvent event) -> {
-			switch(provider.getState(event.getPin())) {
+			switch (provider.getState(event.getPin())) {
 			case HIGH:
 				red.setIcon(createImageIcon("/leds/red.png"));
 				break;
@@ -86,11 +86,11 @@ public class WindowedSimulator extends JFrame {
 			}
 		});
 		displayers.add(red, constraints);
-		
+
 		constraints.gridx++;
 		JLabel green = new JLabel(createImageIcon("/leds/off.png"));
 		provider.addListener(RaspiPin.GPIO_28, (PinEvent event) -> {
-			switch(provider.getState(event.getPin())) {
+			switch (provider.getState(event.getPin())) {
 			case HIGH:
 				green.setIcon(createImageIcon("/leds/green.png"));
 				break;
@@ -100,11 +100,11 @@ public class WindowedSimulator extends JFrame {
 			}
 		});
 		displayers.add(green, constraints);
-		
+
 		constraints.gridx++;
 		JLabel yellow = new JLabel(createImageIcon("/leds/off.png"));
 		provider.addListener(RaspiPin.GPIO_27, (PinEvent event) -> {
-			switch(provider.getState(event.getPin())) {
+			switch (provider.getState(event.getPin())) {
 			case HIGH:
 				yellow.setIcon(createImageIcon("/leds/yellow.png"));
 				break;
@@ -114,11 +114,11 @@ public class WindowedSimulator extends JFrame {
 			}
 		});
 		displayers.add(yellow, constraints);
-		
+
 		constraints.gridx++;
 		JLabel blue = new JLabel(createImageIcon("/leds/off.png"));
 		provider.addListener(RaspiPin.GPIO_25, (PinEvent event) -> {
-			switch(provider.getState(event.getPin())) {
+			switch (provider.getState(event.getPin())) {
 			case HIGH:
 				blue.setIcon(createImageIcon("/leds/blue.png"));
 				break;
@@ -128,11 +128,11 @@ public class WindowedSimulator extends JFrame {
 			}
 		});
 		displayers.add(blue, constraints);
-		
+
 		constraints.gridx++;
 		JLabel alarm = new JLabel(createImageIcon("/alarm/off.png"));
 		provider.addListener(RaspiPin.GPIO_16, (PinEvent event) -> {
-			switch(provider.getState(event.getPin())) {
+			switch (provider.getState(event.getPin())) {
 			case HIGH:
 				alarm.setIcon(createImageIcon("/alarm/on.png"));
 				break;
@@ -145,17 +145,17 @@ public class WindowedSimulator extends JFrame {
 
 		mainConstraints.gridx++;
 		mainPanel.add(displayers, mainConstraints);
-		
+
 		JPanel triggers = new JPanel(new GridBagLayout());
 		triggers.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Déclencheurs"));
 
-		/*constraints.gridx = 0;
-		constraints.gridy = 0;
-		JButton heat = new JButton(createImageIcon("/triggers/heat.png"));
-		heat.addActionListener((ActionEvent e) -> {
-		});
-		triggers.add(heat, constraints);*/
-		
+		/*
+		 * constraints.gridx = 0; constraints.gridy = 0; JButton heat = new
+		 * JButton(createImageIcon("/triggers/heat.png"));
+		 * heat.addActionListener((ActionEvent e) -> { }); triggers.add(heat,
+		 * constraints);
+		 */
+
 		constraints.gridx++;
 		JButton motion = new JButton(createImageIcon("/triggers/motion.png"));
 		motion.addActionListener((ActionEvent e) -> {
@@ -163,7 +163,7 @@ public class WindowedSimulator extends JFrame {
 			provider.setState(RaspiPin.GPIO_04, PinState.LOW);
 		});
 		triggers.add(motion, constraints);
-		
+
 		constraints.gridx++;
 		JButton window = new JButton(createImageIcon("/triggers/window.png"));
 		window.addActionListener((ActionEvent e) -> {
@@ -174,21 +174,20 @@ public class WindowedSimulator extends JFrame {
 
 		mainConstraints.gridx++;
 		mainPanel.add(triggers, mainConstraints);
-		
 
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
-	
+
 	public void updateNotificationLabel() {
 		String preparedString = "Notifications :\n";
-		for(String notif : notifs) {
+		for (String notif : notifs) {
 			preparedString += notif + "\n";
 		}
 		this.notificationLabel.setText(preparedString);
 	}
-	
+
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	private ImageIcon createImageIcon(String path) {
 		URL imgURL = getClass().getResource(path);

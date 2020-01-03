@@ -23,10 +23,12 @@ import me.security.hardware.sensors.SensorType;
  * @since 24/11/2019
  */
 public class SecuManager implements Closeable {
-	
-	public static final Pin[] digiLines = new Pin[]{RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22, RaspiPin.GPIO_21};
-	public static final Pin[] digiColumns = new Pin[]{RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01, RaspiPin.GPIO_00};
-	
+
+	public static final Pin[] digiLines = new Pin[] { RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22,
+			RaspiPin.GPIO_21 };
+	public static final Pin[] digiColumns = new Pin[] { RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01,
+			RaspiPin.GPIO_00 };
+
 	private final NotificationManager notif;
 	private final DatabaseManager db;
 	private RestAPIManager restApi;
@@ -34,7 +36,7 @@ public class SecuManager implements Closeable {
 	private boolean enabled = false;
 	private boolean alarmTriggered = false;
 	private File saveFile;
-	
+
 	private List<Sensor> sensors;
 	private DisplayElement blueLed;
 	private DisplayElement redLed;
@@ -43,24 +45,28 @@ public class SecuManager implements Closeable {
 
 	private DisplayElement alarm;
 	private Buzzer buzzer;
-	
+
 	private Digicode digicode;
-	
+
 	/**
 	 * Create an instance of a Security Manager<br>
-	 * This will initialize all the hardware needed and log an initialization message<br>
+	 * This will initialize all the hardware needed and log an initialization
+	 * message<br>
 	 * This will also run a RestAPIManager instance
+	 * 
 	 * @param notifications
 	 * @param db
 	 * @throws UnsatisfiedLinkError If this doesn't run with required C libraries
-	 * @throws IOException RestAPI input output
+	 * @throws IOException          RestAPI input output
 	 */
 	public SecuManager(NotificationManager notifications, DatabaseManager db) throws UnsatisfiedLinkError, IOException {
-		if(notifications == null) throw new IllegalArgumentException("NotificationManager cannot be null");
-		if(db == null) throw new IllegalArgumentException("DatabaseManager cannot be null");
+		if (notifications == null)
+			throw new IllegalArgumentException("NotificationManager cannot be null");
+		if (db == null)
+			throw new IllegalArgumentException("DatabaseManager cannot be null");
 		this.notif = notifications;
 		this.db = db;
-		
+
 		this.saveFile = new File("alarm.dat");
 
 		this.blueLed = new DisplayElement(RaspiPin.GPIO_25);
@@ -71,35 +77,34 @@ public class SecuManager implements Closeable {
 
 		this.alarm = new DisplayElement(RaspiPin.GPIO_16);
 		this.buzzer = new Buzzer(RaspiPin.GPIO_15);
-		
-		this.digicode = new Digicode
-				(this,
-				"1574",
-				digiLines,
-				digiColumns);
-		
+
+		this.digicode = new Digicode(this, "1574", digiLines, digiColumns);
+
 		this.sensors = new ArrayList<Sensor>();
 		this.sensors.add(new Sensor(this, "Mouvement salon", SensorType.MOTION, RaspiPin.GPIO_04));
 		this.sensors.add(new Sensor(this, "Fenêtre avant", SensorType.OPEN, RaspiPin.GPIO_07));
-		//this.sensors.add(new Sensor(this, "Fenêtre arrière", SensorType.OPEN, RaspiPin.GPIO_31));
-		//this.sensors.add(new Sensor(this, "Chaleur salon", SensorType.HEAT, RaspiPin.GPIO_28));
-		//this.sensors.add(new Sensor(this, "Gaz salon", SensorType.GAS, RaspiPin.GPIO_24));
-		for(Sensor s : this.sensors) {
-			s.toggle();//TODO Remove and from save
+		// this.sensors.add(new Sensor(this, "Fenêtre arrière", SensorType.OPEN,
+		// RaspiPin.GPIO_31));
+		// this.sensors.add(new Sensor(this, "Chaleur salon", SensorType.HEAT,
+		// RaspiPin.GPIO_28));
+		// this.sensors.add(new Sensor(this, "Gaz salon", SensorType.GAS,
+		// RaspiPin.GPIO_24));
+		for (Sensor s : this.sensors) {
+			s.toggle();// TODO Remove and from save
 		}
-		
+
 		this.db.log("Initialized system correctly.\n" + this.notif.toString());
 		this.notif.triggerIFTTT("System initialized.");
 
 		this.restApi = new RestAPIManager(this);
 	}
-	
+
 	public void triggerAlarm(String sensorName, String alertMessage) {
 		if (!enabled) {
 			System.out.println("Detection with disabled system. (" + sensorName + " | " + alertMessage + ")");
 			return;
 		}
-		
+
 		this.notif.triggerAll("Détection d'un problème à " + sensorName + " : " + alertMessage);
 		this.db.alert(sensorName, alertMessage);
 		this.alarm.blinkIndefinitly();
@@ -108,7 +113,7 @@ public class SecuManager implements Closeable {
 	}
 
 	public void toggleAlarm(String code) {
-		if(this.enabled && this.alarmTriggered) {
+		if (this.enabled && this.alarmTriggered) {
 			this.alarm.set(false);
 			this.redLed.set(false);
 			this.db.log("Triggered alarm is now controlled by " + code);
@@ -121,7 +126,7 @@ public class SecuManager implements Closeable {
 		this.buzzer.buzzHighNote();
 		this.greenLed.set(enabled);
 	}
-	
+
 	public void saveAlarmState() {
 		try {
 			FileUtils.write(this.saveFile, this.isEnabled() + "", StandardCharsets.UTF_8);
@@ -145,6 +150,7 @@ public class SecuManager implements Closeable {
 
 	/**
 	 * Doesn't allow sensor list modification
+	 * 
 	 * @return The list of sensors
 	 */
 	public final List<Sensor> getSensors() {
@@ -170,11 +176,11 @@ public class SecuManager implements Closeable {
 	public Digicode getDigicode() {
 		return this.digicode;
 	}
-	
+
 	public RestAPIManager getRestApi() {
 		return this.restApi;
 	}
-	
+
 	public NotificationManager getNotif() {
 		return this.notif;
 	}

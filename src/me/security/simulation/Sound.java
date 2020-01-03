@@ -30,8 +30,10 @@ public class Sound {
 			sdl.drain();
 			sdl.stop();
 			sdl.close();
-		} catch(IllegalArgumentException e) {} //No more lines with 8k Hz available
-		  catch(LineUnavailableException e) {} //Multiple sound at the same time..
+		} catch (IllegalArgumentException e) {
+		} // No more lines with 8k Hz available
+		catch (LineUnavailableException e) {
+		} // Multiple sound at the same time..
 	}
 
 }

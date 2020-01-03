@@ -7,4 +7,5 @@ import notification.IFTTTTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({ FreeAPITest.class, IFTTTTest.class })
-public class NotificationTests {}
+public class NotificationTests {
+}

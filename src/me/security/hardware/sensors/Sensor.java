@@ -15,34 +15,35 @@ import me.security.managers.SecuManager;
  * @since 24/11/2019
  */
 public class Sensor {
-	
+
 	public static final long WAIT_BEFORE_TRIGGER = 15 * 1000L;
 	public static int AUTO_INCREMENT = 0;
-	
+
 	@Expose private final int id;
 	@Expose private boolean isEnabled;
 	@Expose private long lastActivated;
 	@Expose private final String name;
 	@Expose private final SensorType type;
-	
+
 	private final SecuManager secuManager;
 	private GpioPinDigitalInput pin;
-			
+
 	private Thread triggering;
-	
+
 	/**
 	 * Create a sensor handler
+	 * 
 	 * @param manager The linked security manager
-	 * @param name The name of the sensor, or where it is located
-	 * @param type The type of the sensor, this will defined it behavior in triggering
-	 * @param pin The connected pin
+	 * @param name    The name of the sensor, or where it is located
+	 * @param type    The type of the sensor, this will defined it behavior in triggering
+	 * @param pin     The connected pin
 	 * @throws IllegalArgumentException All elements must be different from null
 	 */
 	public Sensor(SecuManager manager, String name, SensorType type, Pin pin) {
-		if(manager == null) throw new IllegalArgumentException("SecuManager cannot be null");
-		if(name == null) throw new IllegalArgumentException("Sensor must have a name");
-		if(type == null) throw new IllegalArgumentException("Sensor must have a type");
-		if(pin == null) throw new IllegalArgumentException("Sensor must be connected to a pin");
+		if (manager == null) throw new IllegalArgumentException("SecuManager cannot be null");
+		if (name == null) throw new IllegalArgumentException("Sensor must have a name");
+		if (type == null) throw new IllegalArgumentException("Sensor must have a type");
+		if (pin == null) throw new IllegalArgumentException("Sensor must be connected to a pin");
 		this.id = (AUTO_INCREMENT = AUTO_INCREMENT + 1);
 		this.isEnabled = false;
 		this.lastActivated = -1L;
@@ -50,11 +51,11 @@ public class Sensor {
 		this.name = name;
 		this.pin = GpioFactory.getInstance().provisionDigitalInputPin(pin, "Sensor " + type + " " + name);
 		this.type = type;
-		
+
 		this.pin.addListener(new GpioPinListenerDigital() {
 			@Override
 			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-				if(event.getEdge() == PinEdge.FALLING) return;
+				if (event.getEdge() == PinEdge.FALLING) return;
 				Sensor.this.trigger();
 			}
 		});
@@ -66,7 +67,7 @@ public class Sensor {
 	public int getId() {
 		return this.id;
 	}
-	
+
 	/**
 	 * @see SensorType
 	 * @return The type of this sensor
@@ -81,48 +82,56 @@ public class Sensor {
 	public boolean isEnabled() {
 		return this.isEnabled;
 	}
-	
+
 	/**
 	 * Enable or disable this sensor
 	 */
 	public void toggle() {
 		this.isEnabled = !this.isEnabled;
 	}
-	
+
 	/**
 	 * @return Is currently triggering alarm (counting down 'WAIT_BEFORE_TRIGGER')
 	 */
 	public boolean isTriggering() {
 		return this.triggering != null && this.triggering.isAlive();
 	}
-	
+
 	/**
-	 * Trigger this sensor, this will have an effect only if this sensor is enabled<br>
-	 * and the last time it was activated is superior to the activation threshold <br><br>
+	 * Trigger this sensor, this will have an effect only if this sensor is
+	 * enabled<br>
+	 * and the last time it was activated is superior to the activation threshold
+	 * <br>
+	 * <br>
 	 * 
 	 * This will wait 'WAIT_BEFORE_ALARM' time before triggering the main alarm
+	 * 
 	 * @see SensorType.getTimeBetweenActivation()
 	 * @return Return true if this trigger had an effect on the alarm.
 	 */
 	@SuppressWarnings("deprecation")
 	public boolean trigger() {
-		if(!isEnabled && lastActivated + this.getType().getTimeBetweenActivation() < System.currentTimeMillis()) return false;
+		if (!isEnabled && lastActivated + this.getType().getTimeBetweenActivation() < System.currentTimeMillis())
+			return false;
 		this.lastActivated = System.currentTimeMillis();
-		
-		if(this.triggering != null) this.triggering.stop();
-		
-		this.triggering = new Thread(() ->  {
+
+		if (this.triggering != null)
+			this.triggering.stop();
+
+		this.triggering = new Thread(() -> {
 			this.secuManager.getRedLed().blinkIndefinitly();
-			
+
 			try {
 				Thread.sleep(WAIT_BEFORE_TRIGGER);
-			} catch (InterruptedException e) {}
-			
-			if(!isEnabled) return;//Still enabled ?
+			} catch (InterruptedException e) {
+			}
+
+			if (!isEnabled)
+				return;// Still enabled ?
 			this.secuManager.triggerAlarm(this.name, this.getType().getAlertMessage());
 		});
 		this.triggering.start();
-		
+
 		return true;
 	}
 

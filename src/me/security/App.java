@@ -15,45 +15,45 @@ import me.security.simulation.SimulatedMode;
  * @since 24/11/2019
  */
 public class App {
-	
+
 	/**
-	 * The main entry point of RaspSecurity.
-	 * Utilization of the argument --simulated is needed if running this on Windows
+	 * The main entry point of RaspSecurity. Utilization of the argument --simulated
+	 * is needed if running this on Windows
 	 */
 	public static void main(String[] args) throws UnsatisfiedLinkError, IOException {
 		System.out.println("Launching RaspSecurityTest... (" + new File(".").getAbsolutePath() + ")");
-		for(String s : args) {
-			if(s.toLowerCase().equals("--simulated")) {
+		for (String s : args) {
+			if (s.toLowerCase().equals("--simulated")) {
 				SimulatedMode.setup();
 			}
 		}
 
 		DatabaseManager db = DatabaseManager.generateFromFile();
 		NotificationManager notif = new NotificationManager();
-		
+
 		try {
 			NotificationFreeAPI fm = NotificationFreeAPI.generateFromFile();
 			notif.add(fm);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		try {
 			NotificationIFTTT ifttt = NotificationIFTTT.generateFromFile();
 			notif.add(ifttt);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		/*
 		 * Security handler
 		 */
 		SecuManager secu = new SecuManager(notif, db);
-		
-		if(SimulatedMode.IS_SIMULATED)
+
+		if (SimulatedMode.IS_SIMULATED)
 			SimulatedMode.launchSimulatedWindow(secu);
-		
-		//Adding closing mechanism to shutdown DB connection
+
+		// Adding closing mechanism to shutdown DB connection
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			System.out.println("Closing RaspSecurityTest...");
 			secu.close();

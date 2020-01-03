@@ -8,4 +8,5 @@ import managers.RestAPITest;
 
 @RunWith(Suite.class)
 @SuiteClasses({ RestAPITest.class, DatabaseTest.class, NotifManagerTest.class })
-public class ManagersTests {}
+public class ManagersTests {
+}

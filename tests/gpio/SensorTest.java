@@ -30,25 +30,25 @@ import utils.dummy.DummyDatabaseManager;
  * 
  */
 public class SensorTest {
-	
+
 	private static SimulatedGpioProvider gpio;
-	
-    private SecuManager secu;
-    private Sensor s1;
-    private Sensor s2;
-    
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        gpio = new SimulatedGpioProvider();
-        GpioFactory.setDefaultProvider(gpio);
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
+
+	private SecuManager secu;
+	private Sensor s1;
+	private Sensor s2;
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		gpio = new SimulatedGpioProvider();
+		GpioFactory.setDefaultProvider(gpio);
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
 		JUnitGPIO.cleanOut(gpio);
-    	gpio = null;
-    }
-	
+		gpio = null;
+	}
+
 	@Before
 	public void setUp() throws Exception {
 		this.secu = new SecuManager(new NotificationManager(), new DummyDatabaseManager());
@@ -99,10 +99,11 @@ public class SensorTest {
 
 		gpio.setState(RaspiPin.GPIO_13, PinState.HIGH);
 		gpio.setState(RaspiPin.GPIO_13, PinState.LOW);
-		
-		Thread.sleep(300L);//We have to wait as the SimulatedRaspi is async thread that can't be var synchronized -_-
+
+		Thread.sleep(300L);// We have to wait as the SimulatedRaspi is async thread that can't be var
+							// synchronized -_-
 		assertTrue(this.s1.isTriggering());
-		
+
 		Thread.sleep(Sensor.WAIT_BEFORE_TRIGGER);
 		assertTrue(this.secu.hasAlarmTriggered());
 	}

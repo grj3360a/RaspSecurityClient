@@ -17,7 +17,7 @@ import me.security.notification.NotificationFreeAPI;
  *
  */
 public class NotifManagerTest {
-	
+
 	private NotificationManager notif;
 
 	@Before
@@ -35,33 +35,33 @@ public class NotifManagerTest {
 		this.notif.add(NotificationFreeAPI.generateFromFile());
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testAddNull() {
 		this.notif.add(null);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testAddAlreadyContains() throws Exception {
 		this.notif.add(NotificationFreeAPI.generateFromFile());
 		this.notif.add(NotificationFreeAPI.generateFromFile());
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testTriggerFreeNull() {
 		this.notif.triggerFree(null);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testTriggerFreeEmpty() {
 		this.notif.triggerFree("");
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testTriggerIFTTTNoValues() {
 		this.notif.triggerIFTTT();
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testTriggerIFTTT4Values() {
 		this.notif.triggerIFTTT("", "", "", "");
 	}
@@ -74,9 +74,9 @@ public class NotifManagerTest {
 	@Test
 	public void testToStringWithFree() throws Exception {
 		this.notif.add(NotificationFreeAPI.generateFromFile());
-		assertEquals("Currently active notifications system:\n" + 
-					" - me.security.notification.NotificationFreeAPI\n" + 
-					"", this.notif.toString());
+		assertEquals(
+				"Currently active notifications system:\n" + " - me.security.notification.NotificationFreeAPI\n" + "",
+				this.notif.toString());
 	}
 
 }

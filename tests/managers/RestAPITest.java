@@ -30,33 +30,33 @@ public class RestAPITest {
 
 	private static SimulatedGpioProvider gpio;
 	private static String jUnitAppPassword;
-	
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    	jUnitAppPassword = "eaz897hfg654kiu714sf32d1";
-        gpio = new SimulatedGpioProvider();
-        GpioFactory.setDefaultProvider(gpio);
-        SimulatedMode.IS_SIMULATED = true;//We are running on Windows
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		jUnitAppPassword = "eaz897hfg654kiu714sf32d1";
+		gpio = new SimulatedGpioProvider();
+		GpioFactory.setDefaultProvider(gpio);
+		SimulatedMode.IS_SIMULATED = true;// We are running on Windows
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
 		JUnitGPIO.cleanOut(gpio);
-    	gpio = null;
-    }
-    
-    //
+		gpio = null;
+	}
+
+	//
 
 	private HttpClient httpClient;
 	private SecuManager secu;
 	private RestAPIManager restapi;
-	
+
 	@Before
 	public void setUp() throws Exception {
-		//Get the RestAPI from a dummy SecurityManager
+		// Get the RestAPI from a dummy SecurityManager
 		this.secu = new SecuManager(new NotificationManager(), new DummyDatabaseManager());
 		this.restapi = this.secu.getRestApi();
-		//We need a HttpClient to create GET request
+		// We need a HttpClient to create GET request
 		this.httpClient = HttpClientBuilder.create().build();
 	}
 
@@ -67,14 +67,14 @@ public class RestAPITest {
 		this.restapi = null;
 		JUnitGPIO.cleanOut(gpio);
 	}
-	
+
 	@Test
 	public void testNoAuth() throws Exception {
 		HttpGet request = new HttpGet("http://127.0.0.1:" + RestAPIManager.PORT + "/alarm");
 		HttpResponse hr = this.httpClient.execute(request);
 		assertEquals(401, hr.getStatusLine().getStatusCode());
 	}
-	
+
 	@Test
 	public void testInvalidAuth() throws Exception {
 		HttpGet request = new HttpGet("http://127.0.0.1:" + RestAPIManager.PORT + "/alarm");
@@ -97,13 +97,13 @@ public class RestAPITest {
 		System.out.println("http://127.0.0.1:" + RestAPIManager.PORT + "/alarm/toggle");
 		HttpGet request = new HttpGet("http://127.0.0.1:" + RestAPIManager.PORT + "/alarm/toggle");
 		request.addHeader("appPassword", jUnitAppPassword);
-		
-		//Toggle ON
+
+		// Toggle ON
 		HttpResponse hrOnToggle = this.httpClient.execute(request);
 		assertEquals(200, hrOnToggle.getStatusLine().getStatusCode());
 		assertEquals("true", IOUtils.toString(new InputStreamReader(hrOnToggle.getEntity().getContent())).trim());
-		
-		//Toggle OFF on the same object
+
+		// Toggle OFF on the same object
 		HttpResponse hrOffToggle = this.httpClient.execute(request);
 		assertEquals(200, hrOffToggle.getStatusLine().getStatusCode());
 		assertEquals("false", IOUtils.toString(new InputStreamReader(hrOffToggle.getEntity().getContent())).trim());

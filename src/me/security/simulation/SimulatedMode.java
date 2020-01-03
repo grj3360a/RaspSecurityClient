@@ -12,27 +12,30 @@ import utils.JUnitUtil;
 
 /**
  * Allows to launch this program without Raspberry
+ * 
  * @author Geraldes Jocelyn
  * @since 24/12/2019
  */
 public class SimulatedMode {
-	
+
 	public static boolean IS_SIMULATED = JUnitUtil.isJUnitTest();
-	
+
 	/**
-	 * Setup the SimulatedMode<br><br>
+	 * Setup the SimulatedMode<br>
+	 * <br>
 	 * Define the GpioProvider to simulated<br>
 	 * Then simulate pressing button and displaying led state
 	 */
 	public static void setup() {
 		IS_SIMULATED = true;
-        GpioProvider provider = new SimulatedGpioProvider();
-        GpioFactory.setDefaultProvider(provider);
-        System.out.println("Enabled system in simulated environment.");
+		GpioProvider provider = new SimulatedGpioProvider();
+		GpioFactory.setDefaultProvider(provider);
+		System.out.println("Enabled system in simulated environment.");
 	}
 
 	public static void launchSimulatedWindow(SecuManager secu) {
-		if(!IS_SIMULATED) return;
+		if (!IS_SIMULATED)
+			return;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
@@ -46,5 +49,5 @@ public class SimulatedMode {
 			}
 		});
 	}
-	
+
 }

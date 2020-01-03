@@ -23,32 +23,32 @@ import utils.JUnitUtil;
 
 /**
  * @author Geraldes Jocelyn
- * @since 15/12/2019
- * Manage a web server to answer requests from mobile app
+ * @since 15/12/2019 Manage a web server to answer requests from mobile app
  */
 public class RestAPIManager {
 
 	public static int PORT = 8080;
-	
+
 	private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 	private static final List<String> AUTHS = Arrays.asList("eaz897hfg654kiu714sf32d1");
-	
+
 	private final SecuManager security;
 	private final ServerSocket server;
 	private boolean enabled;
 
 	/**
 	 * Immediatly start a web server on PORT to answer queries from mobile app
+	 * 
 	 * @param security The main SecuManager
 	 * @throws IOException If serversocket fails to create
 	 */
 	public RestAPIManager(SecuManager security) throws IOException, BindException {
 		this.security = security;
 		this.enabled = true;
-		
-		if(JUnitUtil.isJUnitTest())
+
+		if (JUnitUtil.isJUnitTest())
 			PORT = 0;
-		
+
 		this.server = new ServerSocket(PORT);
 		PORT = this.server.getLocalPort();
 		System.out.println("Listening on port " + server.getLocalPort());
@@ -58,11 +58,11 @@ public class RestAPIManager {
 				try {
 					ConnectionThread thread = new ConnectionThread(RestAPIManager.this.security, server.accept());
 					thread.start();
-				} catch(Exception ex) {
+				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
-				
+
 			try {
 				RestAPIManager.this.server.close();
 			} catch (IOException e) {
@@ -70,12 +70,12 @@ public class RestAPIManager {
 			}
 		}).start();
 	}
-	
+
 	/**
 	 * Manage a specific connection from a single socket
 	 */
 	private class ConnectionThread extends Thread {
-		
+
 		private final SecuManager security;
 		private Socket client;
 
@@ -88,24 +88,23 @@ public class RestAPIManager {
 			InputStream input = null;
 			OutputStream output = null;
 			Scanner inputReader = null;
-			
+
 			try {
 				input = this.client.getInputStream();
 				output = this.client.getOutputStream();
 			} catch (IOException e) {
 				e.printStackTrace();
 				return;
-			} 
-			
+			}
+
 			try {
 				inputReader = new Scanner(input);
 				inputReader.useDelimiter("\n");
 				if (!inputReader.hasNext()) {
 					sendError(output, "Invalid header ?");
-					return;//Ignore invalid request.
+					return;// Ignore invalid request.
 				}
-				
-				
+
 				String url = inputReader.next().split(" ")[1];
 
 				/*
@@ -113,76 +112,76 @@ public class RestAPIManager {
 				 */
 				String headerLine = null;
 				Map<String, String> headers = new HashMap<String, String>();
-				while(inputReader.hasNext()) {
+				while (inputReader.hasNext()) {
 					headerLine = inputReader.next();
-					headerLine = headerLine.substring(0, headerLine.length()-1);
-					if(headerLine.contains(": ")) {
+					headerLine = headerLine.substring(0, headerLine.length() - 1);
+					if (headerLine.contains(": ")) {
 						headers.put(headerLine.split(": ")[0], headerLine.split(": ")[1]);
 					} else {
 						break;
 					}
 				}
-				
-				if(!isAuthed(headers)) {
+
+				if (!isAuthed(headers)) {
 					sendNotAuth(output);
 					return;
 				}
-				
-				switch(url) { // Switch between different endpoint
-				
+
+				switch (url) { // Switch between different endpoint
+
 				case "/alarm":
 					sendText(output, this.security.isEnabled() + "");
 					break;
-					
+
 				case "/alarm/toggle":
 					this.security.toggleAlarm("APP.");
 					sendText(output, this.security.isEnabled() + "");
 					break;
-					
+
 				case "/alarm/test":
 					this.security.triggerAlarm("TEST", "Activation de l'alarme de test.");
 					sendText(output, "true");
 					break;
-				
+
 				case "/notify":
 					List<Log> logs = this.security.getDb().getLast10Logs();
 					sendText(output, GSON.toJson(logs));
 					break;
-					
+
 				case "/sensors":
 					sendText(output, GSON.toJson(this.security.getSensors()));
 					break;
-				
+
 				default:
-					if(url.startsWith("/sensor/")) {
+					if (url.startsWith("/sensor/")) {
 						try {
 							Sensor target = null;
 							int id = Integer.parseInt(url.split("/")[2]);
-							for(Sensor s : this.security.getSensors()) {
-								if(s.getId() == id) {
+							for (Sensor s : this.security.getSensors()) {
+								if (s.getId() == id) {
 									target = s;
 								}
 							}
-							
-							if(target == null) {
+
+							if (target == null) {
 								throw new IllegalArgumentException(id + "");
 							}
-							
-							switch(url.replaceFirst("/sensor/" + id, "")) {
-							
+
+							switch (url.replaceFirst("/sensor/" + id, "")) {
+
 							case "/toggle":
 								target.toggle();
 								sendText(output, target.isEnabled() + "");
 								break;
-								
-							//Potentially add other endpoint to manage sensor ?
-								
+
+							// Potentially add other endpoint to manage sensor ?
+
 							default:
 								sendNotFound(output, url);
 								break;
-							
+
 							}
-						} catch(NumberFormatException ex) {
+						} catch (NumberFormatException ex) {
 							throw new Exception("Invalid sensor ID.");
 						}
 					} else {
@@ -199,9 +198,9 @@ public class RestAPIManager {
 				e.printStackTrace();
 				sendError(output, e.getMessage());
 			} finally {
-				if(inputReader != null)
+				if (inputReader != null)
 					inputReader.close();
-				
+
 				try {
 					output.close();
 				} catch (IOException e) {
@@ -212,6 +211,7 @@ public class RestAPIManager {
 
 		/**
 		 * Verify if headers contains valid auth password
+		 * 
 		 * @param headers Headers sended by a request
 		 * @return True if headers contains appPassword & a valid auth password.
 		 */
@@ -221,12 +221,13 @@ public class RestAPIManager {
 					return AUTHS.contains(headerLine.getValue());
 				}
 			}
-			
+
 			return false;
 		}
-		
+
 		/**
 		 * Send error 500 to output stream from the socket
+		 * 
 		 * @param msg The specific problem encountered
 		 */
 		private void sendError(OutputStream output, String msg) {
@@ -237,7 +238,7 @@ public class RestAPIManager {
 			out.println("");
 			out.flush();
 		}
-		
+
 		/**
 		 * Send error 401 to output stream from the socket
 		 */
@@ -247,9 +248,10 @@ public class RestAPIManager {
 			out.println("");
 			out.flush();
 		}
-		
+
 		/**
 		 * Send error 404 Not Found to output stream from the socket
+		 * 
 		 * @param url What url was not found
 		 */
 		private void sendNotFound(OutputStream output, String url) {
@@ -263,6 +265,7 @@ public class RestAPIManager {
 
 		/**
 		 * Send ok 200 to output stream from the socket
+		 * 
 		 * @param text Json to answer
 		 */
 		private void sendText(OutputStream output, String text) {
@@ -273,7 +276,6 @@ public class RestAPIManager {
 			out.println(text);
 			out.println("");
 		}
-
 
 	}
 
