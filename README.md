@@ -2,7 +2,9 @@
 
 This project is an implementation of a security system based on a Raspberry Pi linked to sensors and buttons.
 
-Note:
+![Class diagram](https://i.imgur.com/ziPCH02.png)
+
+PINS:
  - RedLed : 24
  - BlueLed : 25
  - YellowLed : 27
