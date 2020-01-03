@@ -69,7 +69,6 @@ public class DigicodeTest {
 		JUnitGPIO.pressDigicode('1');
 		JUnitGPIO.pressDigicode('5');
 		JUnitGPIO.pressDigicode('6');
-		
 
 		JUnitGPIO.pressDigicode('*');
 
