@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.SimulatedGpioProvider;
 
 import me.security.managers.NotificationManager;
@@ -34,9 +33,7 @@ public class RestAPITest {
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		jUnitAppPassword = "eaz897hfg654kiu714sf32d1";
-		gpio = new SimulatedGpioProvider();
-		GpioFactory.setDefaultProvider(gpio);
-		SimulatedMode.IS_SIMULATED = true;// We are running on Windows
+		SimulatedMode.setup();
 	}
 
 	@AfterClass

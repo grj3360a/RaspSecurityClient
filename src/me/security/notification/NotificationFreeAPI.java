@@ -46,11 +46,9 @@ public class NotificationFreeAPI extends NotificationSender {
 	private final String password;
 
 	/**
-	 * Create an instance of FreeAPI, multiple instances of a specific user can be
-	 * instanciated
+	 * Create an instance of FreeAPI, multiple instances of a specific user can be instanciated
 	 * 
-	 * @param user     The account number from Free account manager (format must be
-	 *                 : 12345678)
+	 * @param user     The account number from Free account manager (format must be: 12345678)
 	 * @param password Free mobile password (must be 14 characters)
 	 * @throws IllegalArgumentException user must be 8 numbers
 	 * @throws IllegalArgumentException passwords must be 14 characters
@@ -76,20 +74,15 @@ public class NotificationFreeAPI extends NotificationSender {
 	 * 
 	 * @param message The message to send
 	 * @throws ClientProtocolException message must not be null and not empty
-	 * @throws IOException             in case of a problem or the connection was
-	 *                                 aborted
+	 * @throws IOException             in case of a problem or the connection was aborted
 	 * @throws ClientProtocolException in case of an http protocol error
-	 * @throws IllegalStateException   The response from free api was different from
-	 *                                 "HTTP 200 OK".
+	 * @throws IllegalStateException   The response from free api was different from "HTTP 200 OK".
 	 */
 	@Override
-	public void trigger(String message)
-			throws ClientProtocolException, IOException, IllegalArgumentException, IllegalStateException {
-		if (message == null || message.length() == 0)
-			throw new IllegalArgumentException("Message cannot be null or empty.");
+	public void trigger(String message) throws ClientProtocolException, IOException, IllegalArgumentException, IllegalStateException {
+		if (message == null || message.length() == 0) throw new IllegalArgumentException("Message cannot be null or empty.");
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpGet request = new HttpGet("https://smsapi.free-mobile.fr/sendmsg?user=" + user + "&pass=" + password
-				+ "&msg=" + URLEncoder.encode(message, "UTF-8"));
+		HttpGet request = new HttpGet("https://smsapi.free-mobile.fr/sendmsg?user=" + user + "&pass=" + password + "&msg=" + URLEncoder.encode(message, "UTF-8"));
 		HttpResponse hr = httpClient.execute(request);
 
 		switch (hr.getStatusLine().getStatusCode()) {
@@ -110,8 +103,7 @@ public class NotificationFreeAPI extends NotificationSender {
 			throw new IllegalStateException("Internal server error from FreeAPI... Maybe they are down ?");
 
 		default:
-			throw new IllegalStateException(
-					"Response from Free doesn't validate : " + hr.getStatusLine().getStatusCode());
+			throw new IllegalStateException("Response from Free doesn't validate : " + hr.getStatusLine().getStatusCode());
 		}
 	}
 
@@ -128,10 +120,9 @@ public class NotificationFreeAPI extends NotificationSender {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == null)
-			return false;
-		if (!(o instanceof NotificationFreeAPI))
-			return false;
+		if (o == null) return false;
+		if (!(o instanceof NotificationFreeAPI)) return false;
+		
 		NotificationFreeAPI notif = (NotificationFreeAPI) o;
 		return notif.user == this.user && notif.password.equals(this.password);
 	}

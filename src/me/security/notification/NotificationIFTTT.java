@@ -68,10 +68,8 @@ public class NotificationIFTTT extends NotificationSender {
 
 	@Override
 	public void trigger(List<String> values) throws Exception {
-		if (values == null)
-			throw new IllegalArgumentException("values is null");
-		if (values.isEmpty())
-			throw new IllegalArgumentException("values list is empty");
+		if (values == null) throw new IllegalArgumentException("values is null");
+		if (values.isEmpty()) throw new IllegalArgumentException("values list is empty");
 		for (String v : values)
 			if (v == null || v.length() == 0)
 				throw new IllegalArgumentException("values contains null or empty value");
@@ -93,8 +91,7 @@ public class NotificationIFTTT extends NotificationSender {
 	 * @return A json formattend HashMap of these values
 	 */
 	private String buildJson(List<String> values) {
-		if (values.size() > 3)
-			throw new IllegalArgumentException("IFTTT doesn't accept more than 3 values.");
+		if (values.size() > 3) throw new IllegalArgumentException("IFTTT doesn't accept more than 3 values.");
 		HashMap<String, String> map = new HashMap<String, String>();
 
 		for (int i = 0; i < values.size(); i++) {
@@ -110,6 +107,7 @@ public class NotificationIFTTT extends NotificationSender {
 			return false;
 		if (!(o instanceof NotificationIFTTT))
 			return false;
+		
 		NotificationIFTTT notif = (NotificationIFTTT) o;
 		return notif.event.equals(this.event) && notif.key.equals(this.key);
 	}
