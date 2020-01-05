@@ -83,12 +83,11 @@ public class SecuManager implements Closeable {
 		this.sensors = new ArrayList<Sensor>();
 		this.sensors.add(new Sensor(this, "Mouvement salon", SensorType.MOTION, RaspiPin.GPIO_04));
 		this.sensors.add(new Sensor(this, "Fenêtre avant", SensorType.OPEN, RaspiPin.GPIO_07));
-		// this.sensors.add(new Sensor(this, "Fenêtre arrière", SensorType.OPEN,
-		// RaspiPin.GPIO_31));
-		// this.sensors.add(new Sensor(this, "Chaleur salon", SensorType.HEAT,
-		// RaspiPin.GPIO_28));
-		// this.sensors.add(new Sensor(this, "Gaz salon", SensorType.GAS,
-		// RaspiPin.GPIO_24));
+		
+		// this.sensors.add(new Sensor(this, "Fenêtre arrière", SensorType.OPEN, RaspiPin.GPIO_31));
+		// this.sensors.add(new Sensor(this, "Chaleur salon", SensorType.HEAT, RaspiPin.GPIO_28));
+		// this.sensors.add(new Sensor(this, "Gaz salon", SensorType.GAS, RaspiPin.GPIO_24));
+		
 		for (Sensor s : this.sensors) {
 			s.toggle();// TODO Remove and from save
 		}

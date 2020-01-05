@@ -23,8 +23,7 @@ public class SimulatedMode {
 	/**
 	 * Setup the SimulatedMode<br>
 	 * <br>
-	 * Define the GpioProvider to simulated<br>
-	 * Then simulate pressing button and displaying led state
+	 * Define the GpioProvider to simulated
 	 */
 	public static void setup() {
 		IS_SIMULATED = true;

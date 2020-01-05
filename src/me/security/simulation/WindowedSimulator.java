@@ -5,8 +5,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -28,10 +26,6 @@ import utils.JUnitGPIO;
 
 @SuppressWarnings("serial")
 public class WindowedSimulator extends JFrame {
-
-	private JLabel notificationLabel = new JLabel("Liste des notifications :");
-
-	public List<String> notifs = new ArrayList<String>();
 
 	public WindowedSimulator(SecuManager secu) {
 		super("Simulateur");
@@ -149,13 +143,6 @@ public class WindowedSimulator extends JFrame {
 		JPanel triggers = new JPanel(new GridBagLayout());
 		triggers.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Déclencheurs"));
 
-		/*
-		 * constraints.gridx = 0; constraints.gridy = 0; JButton heat = new
-		 * JButton(createImageIcon("/triggers/heat.png"));
-		 * heat.addActionListener((ActionEvent e) -> { }); triggers.add(heat,
-		 * constraints);
-		 */
-
 		constraints.gridx++;
 		JButton motion = new JButton(createImageIcon("/triggers/motion.png"));
 		motion.addActionListener((ActionEvent e) -> {
@@ -178,14 +165,6 @@ public class WindowedSimulator extends JFrame {
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-	}
-
-	public void updateNotificationLabel() {
-		String preparedString = "Notifications :\n";
-		for (String notif : notifs) {
-			preparedString += notif + "\n";
-		}
-		this.notificationLabel.setText(preparedString);
 	}
 
 	/** Returns an ImageIcon, or null if the path was invalid. */
