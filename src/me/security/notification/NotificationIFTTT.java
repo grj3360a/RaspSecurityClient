@@ -41,7 +41,6 @@ public class NotificationIFTTT extends NotificationSender {
 		return new NotificationIFTTT(iftttInfo.get(0), iftttInfo.get(1));
 	}
 
-	//
 	private static final Gson GSON = new Gson();
 
 	private String event;
@@ -88,7 +87,7 @@ public class NotificationIFTTT extends NotificationSender {
 	 * Build json with IFTTT format
 	 * 
 	 * @param values The values to format
-	 * @return A json formattend HashMap of these values
+	 * @return A json formatted HashMap of these values
 	 */
 	private String buildJson(List<String> values) {
 		if (values.size() > 3) throw new IllegalArgumentException("IFTTT doesn't accept more than 3 values.");

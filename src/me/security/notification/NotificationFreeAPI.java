@@ -111,7 +111,7 @@ public class NotificationFreeAPI extends NotificationSender {
 	 * Simply calls trigger(String message) because they is no use of multiple
 	 * values with Free API
 	 * 
-	 * @param values Contatenated all values into spaced format
+	 * @param values Concatenated all values into spaced format
 	 */
 	@Override
 	public void trigger(List<String> values) throws Exception {

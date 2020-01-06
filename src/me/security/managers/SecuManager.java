@@ -24,10 +24,8 @@ import me.security.hardware.sensors.SensorType;
  */
 public class SecuManager implements Closeable {
 
-	public static final Pin[] digiLines = new Pin[] { RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22,
-			RaspiPin.GPIO_21 };
-	public static final Pin[] digiColumns = new Pin[] { RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01,
-			RaspiPin.GPIO_00 };
+	public static final Pin[] digiLines = new Pin[] { RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22, RaspiPin.GPIO_21 };
+	public static final Pin[] digiColumns = new Pin[] { RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01, RaspiPin.GPIO_00 };
 
 	private final NotificationManager notif;
 	private final DatabaseManager db;

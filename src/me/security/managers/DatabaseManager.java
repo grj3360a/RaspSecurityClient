@@ -137,8 +137,7 @@ public class DatabaseManager implements AutoCloseable {
 	 * 
 	 * @param relatedToSensor If it is related to a sensor
 	 * @param info            The related information
-	 * @throws IllegalArgumentException The text information must not be null or
-	 *                                  empty
+	 * @throws IllegalArgumentException The text information must not be null or empty
 	 */
 	protected void rawLog(boolean relatedToSensor, String info) throws IllegalArgumentException {
 		if (info == null)
@@ -151,8 +150,7 @@ public class DatabaseManager implements AutoCloseable {
 			if (!isAlive())
 				return;
 
-			PreparedStatement stmt = this.connection
-					.prepareStatement("INSERT INTO `logs`(`relatedToSensor`,`log_info`) VALUES (?,?)");
+			PreparedStatement stmt = this.connection.prepareStatement("INSERT INTO `logs`(`relatedToSensor`,`log_info`) VALUES (?,?)");
 			stmt.setBoolean(1, relatedToSensor);
 			stmt.setString(2, info);
 			stmt.execute();
@@ -182,12 +180,12 @@ public class DatabaseManager implements AutoCloseable {
 			return logs;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return Arrays.asList(new Log(0, new Timestamp(System.currentTimeMillis()), false,
-					"Error on DB connection, unable to retrieve logs."));
+			return Arrays.asList(
+					new Log(0, new Timestamp(System.currentTimeMillis()), false, "Error on DB connection, unable to retrieve logs.")
+					);
 		} catch (Error e) {
 			e.printStackTrace();
-			return Arrays
-					.asList(new Log(0, new Timestamp(System.currentTimeMillis()), false, "Error " + e.getMessage()));
+			return Arrays.asList(new Log(0, new Timestamp(System.currentTimeMillis()), false, "Error " + e.getMessage()));
 		}
 	}
 
@@ -203,7 +201,7 @@ public class DatabaseManager implements AutoCloseable {
 	public void close() {
 		try {
 			System.out.println("Closing connection...");
-			if (this.connection != null && !this.connection.isClosed())
+			if (!this.isAlive())
 				this.connection.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -213,18 +211,13 @@ public class DatabaseManager implements AutoCloseable {
 
 	/**
 	 * Only for serialized reading by RestAPIManager
-	 * 
 	 * @see RestAPIManager
 	 */
 	public static class Log {
-		@Expose
-		public final int id;
-		@Expose
-		public final long time;
-		@Expose
-		public final boolean relatedToSensor;
-		@Expose
-		public final String info;
+		@Expose public final int id;
+		@Expose public final long time;
+		@Expose public final boolean relatedToSensor;
+		@Expose public final String info;
 
 		public Log(int id, Timestamp time, boolean relatedToSensor, String info) {
 			this.id = id;

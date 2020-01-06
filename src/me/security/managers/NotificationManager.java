@@ -91,7 +91,7 @@ public class NotificationManager {
 	 * 
 	 * @param clazz   Specific class of targeted NotificationSender,<br>
 	 *                must be a parent of NotificatioSender class,<br>
-	 *                clazz can be null
+	 *                clazz can be null if wanted to trigger all implementation
 	 * @param message The message to send to targeted NotificationSender
 	 * @throws IllegalArgumentException message cannot be null or empty
 	 */
@@ -119,7 +119,7 @@ public class NotificationManager {
 	 * 
 	 * @param clazz   Specific class of targeted NotificationSender,<br>
 	 *                must be a parent of NotificatioSender class,<br>
-	 *                clazz can be null
+	 *                clazz can be null if wanted to trigger all implementation
 	 * @param message The values to send to targeted NotificationSender
 	 * @throws IllegalArgumentException values cannot be null or empty
 	 */
