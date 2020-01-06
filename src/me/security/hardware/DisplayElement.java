@@ -5,8 +5,7 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 
 /**
- * A hardware element to display an information This can be a led, alarm or a
- * buzzer for example
+ * A hardware element to display an information This can be a led, alarm for example
  * 
  * @author Geraldes Jocelyn
  * @since 24/12/2019

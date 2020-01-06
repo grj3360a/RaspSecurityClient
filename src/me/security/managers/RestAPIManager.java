@@ -37,10 +37,10 @@ public class RestAPIManager {
 	private boolean enabled;
 
 	/**
-	 * Immediatly start a web server on PORT to answer queries from mobile app
+	 * Immediately start a web server on PORT to answer queries from mobile app
 	 * 
 	 * @param security The main SecuManager
-	 * @throws IOException If serversocket fails to create
+	 * @throws IOException If ServerSocket fails to create
 	 */
 	public RestAPIManager(SecuManager security) throws IOException, BindException {
 		this.security = security;

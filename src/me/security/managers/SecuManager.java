@@ -98,7 +98,7 @@ public class SecuManager implements Closeable {
 
 	public void triggerAlarm(String sensorName, String alertMessage) {
 		if (!enabled) {
-			System.out.println("Detection with disabled system. (" + sensorName + " | " + alertMessage + ")");
+			this.db.log("Detection with disabled system. (" + sensorName + " | " + alertMessage + ")");
 			return;
 		}
 
@@ -147,7 +147,6 @@ public class SecuManager implements Closeable {
 
 	/**
 	 * Doesn't allow sensor list modification
-	 * 
 	 * @return The list of sensors
 	 */
 	public final List<Sensor> getSensors() {

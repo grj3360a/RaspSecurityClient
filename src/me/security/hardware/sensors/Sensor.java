@@ -98,21 +98,17 @@ public class Sensor {
 	}
 
 	/**
-	 * Trigger this sensor, this will have an effect only if this sensor is
-	 * enabled<br>
-	 * and the last time it was activated is superior to the activation threshold
-	 * <br>
-	 * <br>
-	 * 
+	 * Trigger this sensor, this will have an effect only if this sensor is enabled<br>
+	 * and the last time it was activated is superior to the activation threshold<br><br>
 	 * This will wait 'WAIT_BEFORE_ALARM' time before triggering the main alarm
 	 * 
 	 * @see SensorType.getTimeBetweenActivation()
 	 * @return Return true if this trigger had an effect on the alarm.
 	 */
 	@SuppressWarnings("deprecation")
-	public boolean trigger() {
+	public void trigger() {
 		if (!isEnabled && lastActivated + this.getType().getTimeBetweenActivation() < System.currentTimeMillis())
-			return false;
+			return;
 		this.lastActivated = System.currentTimeMillis();
 
 		if (this.triggering != null)
@@ -123,16 +119,13 @@ public class Sensor {
 
 			try {
 				Thread.sleep(WAIT_BEFORE_TRIGGER);
-			} catch (InterruptedException e) {
-			}
+			} catch (InterruptedException e) {}
 
 			if (!isEnabled)
 				return;// Still enabled ?
 			this.secuManager.triggerAlarm(this.name, this.getType().getAlertMessage());
 		});
 		this.triggering.start();
-
-		return true;
 	}
 
 }
