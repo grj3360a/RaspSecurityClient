@@ -87,28 +87,30 @@ public class Digicode {
 		this.timeLastError = 0;
 		this.numberOfError = 0;
 
-		this.padc = new GpioPinDigitalMultipurpose[] { provisionPin(columns, 0), provisionPin(columns, 1),
-				provisionPin(columns, 2), provisionPin(columns, 3) };
-		this.padl = new GpioPinDigitalMultipurpose[] { provisionPin(lines, 0), provisionPin(lines, 1),
-				provisionPin(lines, 2), provisionPin(lines, 3) };
+		this.padc = new GpioPinDigitalMultipurpose[] { 
+				provisionPin(columns, 0), 
+				provisionPin(columns, 1),
+				provisionPin(columns, 2), 
+				provisionPin(columns, 3) };
+		this.padl = new GpioPinDigitalMultipurpose[] { 
+				provisionPin(lines, 0), 
+				provisionPin(lines, 1),
+				provisionPin(lines, 2), 
+				provisionPin(lines, 3) };
 
 		this.setupLinesColumnsState();
 
 		for (final GpioPinDigitalInput pc : padc) {
 			pc.addListener(new GpioPinListenerDigital() {
-
 				@Override
 				public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-					if (event.getEdge() == PinEdge.FALLING)
-						return;
-					if (!pc.isMode(PinMode.DIGITAL_INPUT))
-						return;
+					if (event.getEdge() == PinEdge.FALLING) return;
+					if (!pc.isMode(PinMode.DIGITAL_INPUT)) return;
 
 					/*
 					 * Reading a column input So now we have to reverse inputs/outputs Column will
 					 * now output positive and lines will read
 					 */
-
 					for (GpioPinDigitalMultipurpose po : padc) {
 						po.setMode(PinMode.DIGITAL_OUTPUT);
 						po.setState(true);
@@ -118,11 +120,7 @@ public class Digicode {
 						po.setMode(PinMode.DIGITAL_INPUT);
 					}
 
-					/*
-					 * Any high will now be our reading, if multiple input in lines will mean an
-					 * error.
-					 */
-
+					//Any high will now be our reading, if multiple input in lines will mean anerror.
 					int numberOfInput = 0;
 					for (GpioPinDigitalMultipurpose po : padl) {
 						if (po.isHigh())

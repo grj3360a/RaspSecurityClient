@@ -127,7 +127,7 @@ public class RestAPIManager {
 					return;
 				}
 
-				switch (url) { // Switch between different endpoint
+				switch (url) { // Switch between different endpoints
 
 				case "/alarm":
 					sendText(output, this.security.isEnabled() + "");
@@ -174,7 +174,7 @@ public class RestAPIManager {
 								sendText(output, target.isEnabled() + "");
 								break;
 
-							// Potentially add other endpoint to manage sensor ?
+							// Potentially add other endpoints to manage sensor ?
 
 							default:
 								sendNotFound(output, url);
@@ -264,7 +264,7 @@ public class RestAPIManager {
 		}
 
 		/**
-		 * Send ok 200 to output stream from the socket
+		 * Send OK 200 to output stream from the socket
 		 * 
 		 * @param text Json to answer
 		 */
