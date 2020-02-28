@@ -107,6 +107,7 @@ public class Sensor {
 	 */
 	@SuppressWarnings("deprecation")
 	public void trigger() {
+		System.out.println("Detection on sensor : " + this.name);
 		if (!isEnabled && lastActivated + this.getType().getTimeBetweenActivation() < System.currentTimeMillis())
 			return;
 		this.lastActivated = System.currentTimeMillis();
@@ -115,9 +116,11 @@ public class Sensor {
 			this.triggering.stop();
 
 		this.triggering = new Thread(() -> {
-			this.secuManager.getRedLed().blinkIndefinitly();
+			this.secuManager.getRedLed().pulse();
+			if(!this.secuManager.isEnabled()) return;
 
 			try {
+				this.secuManager.getRedLed().blinkIndefinitly();
 				Thread.sleep(WAIT_BEFORE_TRIGGER);
 			} catch (InterruptedException e) {}
 
