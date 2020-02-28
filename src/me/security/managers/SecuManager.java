@@ -27,9 +27,7 @@ public class SecuManager implements Closeable {
 	public static final Pin[] digiLines = new Pin[] { RaspiPin.GPIO_26, RaspiPin.GPIO_23, RaspiPin.GPIO_22, RaspiPin.GPIO_21 };
 	public static final Pin[] digiColumns = new Pin[] { RaspiPin.GPIO_03, RaspiPin.GPIO_02, RaspiPin.GPIO_01, RaspiPin.GPIO_00 };
 
-	private final NotificationManager notif;
-	private final DatabaseManager db;
-	private RestAPIManager restApi;
+	private final ServerSyncManager serverSync;
 
 	private boolean enabled = false;
 	private boolean alarmTriggered = false;
@@ -57,13 +55,8 @@ public class SecuManager implements Closeable {
 	 * @throws UnsatisfiedLinkError If this doesn't run with required C libraries
 	 * @throws IOException          RestAPI input output
 	 */
-	public SecuManager(NotificationManager notifications, DatabaseManager db) throws UnsatisfiedLinkError, IOException {
-		if (notifications == null)
-			throw new IllegalArgumentException("NotificationManager cannot be null");
-		if (db == null)
-			throw new IllegalArgumentException("DatabaseManager cannot be null");
-		this.notif = notifications;
-		this.db = db;
+	public SecuManager() throws UnsatisfiedLinkError, IOException {
+		this.serverSync = new ServerSyncManager(this);
 
 		this.saveFile = new File("alarm.dat");
 
@@ -90,20 +83,18 @@ public class SecuManager implements Closeable {
 			s.toggle();// TODO Remove and from save
 		}
 
-		this.db.log("Initialized system correctly.\n" + this.notif.toString());
-		this.notif.triggerIFTTT("System initialized.");
-
-		this.restApi = new RestAPIManager(this);
+		this.serverSync.log("Initialized system correctly.");
+		this.serverSync.triggerIFTTT("System initialized.");
 	}
 
 	public void triggerAlarm(String sensorName, String alertMessage) {
 		if (!enabled) {
-			this.db.log("Detection with disabled system. (" + sensorName + " | " + alertMessage + ")");
+			this.serverSync.log("Detection with disabled system. (" + sensorName + " | " + alertMessage + ")");
 			return;
 		}
 
-		this.notif.triggerAll("Détection d'un problème à " + sensorName + " : " + alertMessage);
-		this.db.alert(sensorName, alertMessage);
+		this.serverSync.triggerAll("Détection d'un problème à " + sensorName + " : " + alertMessage);
+		this.serverSync.alert(sensorName, alertMessage);
 		this.alarm.blinkIndefinitly();
 		this.redLed.set(true);
 		this.alarmTriggered = true;
@@ -113,13 +104,13 @@ public class SecuManager implements Closeable {
 		if (this.enabled && this.alarmTriggered) {
 			this.alarm.set(false);
 			this.redLed.set(false);
-			this.db.log("Triggered alarm is now controlled by " + code);
-			this.notif.triggerFree("Alarme désactivée après une détection");
+			this.serverSync.log("Triggered alarm is now controlled by " + code);
+			this.serverSync.triggerFree("Alarme désactivée après une détection");
 		}
 		this.enabled = !enabled;
 		this.saveAlarmState();
-		this.db.log("Alarm toggled " + (enabled ? "ON" : "OFF") + " with code : " + code);
-		this.notif.triggerIFTTT("Alarme " + (enabled ? "activée" : "désactivée") + " avec le code " + code);
+		this.serverSync.log("Alarm toggled " + (enabled ? "ON" : "OFF") + " with code : " + code);
+		this.serverSync.triggerIFTTT("Alarme " + (enabled ? "activée" : "désactivée") + " avec le code " + code);
 		this.buzzer.buzzHighNote();
 		this.greenLed.set(enabled);
 	}
@@ -141,8 +132,8 @@ public class SecuManager implements Closeable {
 		this.redLed.set(false);
 		this.yellowLed.set(false);
 		this.greenLed.set(false);
-		this.db.log("System shutdown...");
-		this.db.close();
+		this.serverSync.log("System shutdown...");
+		this.serverSync.close();
 	}
 
 	/**
@@ -173,16 +164,8 @@ public class SecuManager implements Closeable {
 		return this.digicode;
 	}
 
-	public RestAPIManager getRestApi() {
-		return this.restApi;
-	}
-
-	public NotificationManager getNotif() {
-		return this.notif;
-	}
-
-	public DatabaseManager getDb() {
-		return this.db;
+	public ServerSyncManager getServerSync() {
+		return this.serverSync;
 	}
 
 	public boolean hasAlarmTriggered() {

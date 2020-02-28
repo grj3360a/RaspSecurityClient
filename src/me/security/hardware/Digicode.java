@@ -244,7 +244,7 @@ public class Digicode {
 		}
 
 		if (this.numberOfError >= MAXIMUM_NUMBER_OF_TRY && this.timeSinceLastError() < 1000L * 30) {
-			this.secuManager.getDb().log("Passcode try but too many errors");
+			this.secuManager.getServerSync().log("Passcode try but too many errors");
 			this.secuManager.getBuzzer().multipleHigh(5);
 			this.secuManager.getYellowLed().flashing();
 			return;
@@ -284,8 +284,8 @@ public class Digicode {
 		if (!goodPasscode) {
 			this.timeLastError = System.currentTimeMillis();
 			this.numberOfError++;
-			this.secuManager.getDb().log("Passcode error on Digicode");
-			this.secuManager.getNotif().triggerIFTTT("Erreur de digicode...");
+			this.secuManager.getServerSync().log("Passcode error on Digicode");
+			this.secuManager.getServerSync().triggerIFTTT("Erreur de digicode...");
 			this.secuManager.getBuzzer().buzzLowNote();
 			this.secuManager.getYellowLed().flashing();
 		}

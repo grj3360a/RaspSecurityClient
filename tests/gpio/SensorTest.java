@@ -17,10 +17,8 @@ import com.pi4j.io.gpio.SimulatedGpioProvider;
 
 import me.security.hardware.sensors.Sensor;
 import me.security.hardware.sensors.SensorType;
-import me.security.managers.NotificationManager;
 import me.security.managers.SecuManager;
 import utils.JUnitGPIO;
-import utils.dummy.DummyDatabaseManager;
 
 /*
  * Explications sur les difficultées de cette classe :
@@ -51,7 +49,7 @@ public class SensorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		this.secu = new SecuManager(new NotificationManager(), new DummyDatabaseManager());
+		this.secu = new SecuManager();
 		Sensor.AUTO_INCREMENT = 100;
 		this.s1 = new Sensor(secu, "S1", SensorType.MOTION, RaspiPin.GPIO_13);
 		this.s2 = new Sensor(secu, "S2", SensorType.OPEN, RaspiPin.GPIO_14);
