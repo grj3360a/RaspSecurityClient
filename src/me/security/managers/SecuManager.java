@@ -84,7 +84,7 @@ public class SecuManager implements Closeable {
 		}
 
 		this.serverSync.log("Initialized system correctly.");
-		this.serverSync.triggerIFTTT("System initialized.");
+		this.serverSync.triggerNotif("System initialized.");
 	}
 
 	public void triggerAlarm(String sensorName, String alertMessage) {
@@ -93,8 +93,8 @@ public class SecuManager implements Closeable {
 			return;
 		}
 
-		this.serverSync.triggerAll("Détection d'un problème à " + sensorName + " : " + alertMessage);
-		this.serverSync.alert(sensorName, alertMessage);
+		this.serverSync.triggerNotif("Détection d'un problème à " + sensorName + " : " + alertMessage);
+		this.serverSync.log("Détection d'un problème à " + sensorName + " : " + alertMessage);
 		this.alarm.blinkIndefinitly();
 		this.redLed.set(true);
 		this.alarmTriggered = true;
@@ -105,12 +105,12 @@ public class SecuManager implements Closeable {
 			this.alarm.set(false);
 			this.redLed.set(false);
 			this.serverSync.log("Triggered alarm is now controlled by " + code);
-			this.serverSync.triggerFree("Alarme désactivée après une détection");
+			this.serverSync.triggerNotif("Alarme désactivée après une détection");
 		}
 		this.enabled = !enabled;
 		this.saveAlarmState();
 		this.serverSync.log("Alarm toggled " + (enabled ? "ON" : "OFF") + " with code : " + code);
-		this.serverSync.triggerIFTTT("Alarme " + (enabled ? "activée" : "désactivée") + " avec le code " + code);
+		this.serverSync.triggerNotif("Alarme " + (enabled ? "activée" : "désactivée") + " avec le code " + code);
 		this.buzzer.buzzHighNote();
 		this.greenLed.set(enabled);
 	}

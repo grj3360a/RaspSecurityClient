@@ -285,7 +285,7 @@ public class Digicode {
 			this.timeLastError = System.currentTimeMillis();
 			this.numberOfError++;
 			this.secuManager.getServerSync().log("Passcode error on Digicode");
-			this.secuManager.getServerSync().triggerIFTTT("Erreur de digicode...");
+			this.secuManager.getServerSync().triggerNotif("Erreur de digicode...");
 			this.secuManager.getBuzzer().buzzLowNote();
 			this.secuManager.getYellowLed().flashing();
 		}
